@@ -84,6 +84,7 @@ func locateImports() {
 
 	// --- mapping -- add for each new module intercepted --
 	id := "github.com/k2io/go-k2secure"
+	k2secure := "github.com/k2io/go-k2secure/v2"
 	i2kmap["github.com/go-ldap/ldap/v3"] =
 		id + "/k2secure/k2secure_ldapwrap/v2"
 	i2kmap["github.com/mongo-driver/mongo"] =
@@ -137,7 +138,7 @@ func locateImports() {
 		logger.Warnln("No import founds, Assuming application imported all go-k2secure packages")
 		return
 	}
-	if _, ok := k2map[id]; ok == false {
+	if _, ok := k2map[k2secure]; ok == false {
 		logger.Warnln("Needed to enable K2 protect - import:", id)
 	} else {
 		logger.Infoln("OK: K2 protect - imported:", id)
