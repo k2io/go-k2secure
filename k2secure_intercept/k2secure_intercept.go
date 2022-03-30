@@ -446,6 +446,7 @@ func K2RemoveFile(name string) *models.EventJson {
 	}
 	eventId := increaseCount()
 	var args []string
+	args = append(args, name)
 	return k2i.Info.Secure.SendEvent(eventId, "FILE_OPERATION", args)
 }
 

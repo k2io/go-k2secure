@@ -50,12 +50,12 @@ func init_hooks() {
 	initOshooks()
 	initFilehooks()
 	initTrackerhook()
-	initBlacops()
+	initBlackops()
 	k2i.SetHooked()
 
 }
 
-func initBlacops() {
+func initBlackops() {
 	k2secure_ws.FuzzClient = K2HttpFuzz{}
 }
 
