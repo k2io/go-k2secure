@@ -250,8 +250,8 @@ func K2preServeHTTP(url, host string, hdrMap map[string][]string, method string,
 	(*infoReq).K2TraceData = traceData
 	(*infoReq).K2RequestIdentifier = k2RequestIdentifier
 	(*infoReq).ServerName = serverName
-	k2i.Info.Secure.K2associate(infoReq)
 	createFuzzFile(k2RequestIdentifier)
+	k2i.Info.Secure.K2associate(infoReq)
 	dura := time.Since(t)
 	logger.Debugln("k2pre ServerHTTP took (ms):", (dura.Nanoseconds())/1000000)
 }
@@ -356,8 +356,8 @@ func K2grpcResponse(service, method, reply string) {
 }
 
 func K2dissociate() {
-	removeFuzzFile()
 	k2i.Info.Secure.K2dissociate()
+	removeFuzzFile()
 }
 
 func XssCheck() {
