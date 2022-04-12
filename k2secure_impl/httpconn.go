@@ -17,11 +17,11 @@ import (
 
 var hmutex sync.Mutex
 var httpConnMap = sync.Map{}
-var httpConnCatchMap = sync.Map{}
+var httpConnCacheMap = sync.Map{}
 
 func reset(doreset bool) {
 	if doreset {
-		httpConnCatchMap = sync.Map{}
+		httpConnCacheMap = sync.Map{}
 	} else {
 		httpConnMap = sync.Map{}
 	}
@@ -29,7 +29,7 @@ func reset(doreset bool) {
 
 func getHttpConnMap(doreset bool) sync.Map {
 	if doreset {
-		return httpConnCatchMap
+		return httpConnCacheMap
 	} else {
 		return httpConnMap
 	}
@@ -58,14 +58,14 @@ func UpdateHttpConns(url, sourceIP, destinationIP, destinationPort, direction, s
 	key := sourceIP + "," + destinationIP + "," + destinationPort + "," + cannonicalURL(url) + "," + sourceID
 	hmutex.Lock()
 
-	tmpCatch, isPresentCatch := httpConnCatchMap.Load(key)
+	tmpCache, isPresentCache := httpConnCacheMap.Load(key)
 	tmp, isPresent := httpConnMap.Load(key)
 
 	if isPresent {
 		tmp_info := tmp.(*k2models.HTTPConnections)
 		tmp_info.Count++
-	} else if isPresentCatch {
-		tmp_info := tmpCatch.(*k2models.HTTPConnections)
+	} else if isPresentCache {
+		tmp_info := tmpCache.(*k2models.HTTPConnections)
 		tmp_info.Count++
 	} else {
 		tmp_info := new(k2models.HTTPConnections)
@@ -91,7 +91,7 @@ func UpdateHttpConns(url, sourceIP, destinationIP, destinationPort, direction, s
 		tmp_info.Direction = direction
 		tmp_info.Count = 1
 		httpConnMap.Store(key, tmp_info)
-		httpConnCatchMap.Store(key, tmp_info)
+		httpConnCacheMap.Store(key, tmp_info)
 
 	}
 	hmutex.Unlock()
@@ -101,15 +101,15 @@ func UpdateHttpConns(url, sourceIP, destinationIP, destinationPort, direction, s
 // ---------------------------------------------------------------------
 // Func GetHttpConnectionsJSON - called from HealthCheck to send stats
 // ---------------------------------------------------------------------
-func GetHttpConnectionsJSON(isCatched bool) []k2models.HTTPConnections {
+func GetHttpConnectionsJSON(isCached bool) []k2models.HTTPConnections {
 	hmutex.Lock()
-	resultMap := getHttpConnMap(isCatched)
+	resultMap := getHttpConnMap(isCached)
 	var arg []k2models.HTTPConnections
 	resultMap.Range(func(key interface{}, value interface{}) bool {
 		arg = append(arg, *value.(*k2models.HTTPConnections))
 		return true
 	})
-	reset(isCatched)
+	reset(isCached)
 	hmutex.Unlock()
 	return arg
 
