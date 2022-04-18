@@ -313,8 +313,8 @@ func k2ReadThread(k *k2ws) {
 			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway) {
 				logger.Errorln("error unexpected close : ", err)
 				k.RawConnReset("k2ReadThread Connect ERR : " + err.Error()) //reset so we reconnect
-				return
 			}
+			return
 		}
 	}
 }

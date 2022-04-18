@@ -86,14 +86,13 @@ func ParseControlCode(argbuf []byte) error {
 		}
 
 	case 101:
-		arg := []byte(kcc.Arguments[0])
-		logger.Infoln("Control command received cc101 : ", string(arg))
-		var kcc101 k2models.K2ControlCode101_struct
-		err = json.Unmarshal(arg, &kcc101)
+		var blocking k2models.K2ControlCode101_struct
+		err := json.Unmarshal(buf, &blocking)
 		if err != nil {
-			return errors.New("Unable to unmarshall cc101 : " + err.Error())
+			logger.Errorln("Unable to unmarshall cc101 ", err)
+		} else {
+			logger.Debugln("blocking data", blocking.Data)
 		}
-		logger.Infoln("CC(101) - Policy : Blocking (TODO) : ", kcc101)
 	}
 
 	return nil

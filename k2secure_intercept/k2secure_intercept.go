@@ -213,11 +213,14 @@ func K2preServeHTTP(url, host string, hdrMap map[string][]string, method string,
 	filterHeader := map[string]string{}
 	k2RequestIdentifier := ""
 	traceData := ""
+	api_caller := ""
 	for k, v := range hdrMap {
 		if k2Utils.CaseInsensitiveEquals(k, "K2-TRACING-DATA") {
 			traceData = strings.Join(v, ",")
 		} else if k2Utils.CaseInsensitiveEquals(k, "k2-fuzz-request-id") {
 			k2RequestIdentifier = strings.Join(v, ",")
+		} else if k2Utils.CaseInsensitiveEquals(k, "K2-API-CALLER") {
+			api_caller = strings.Join(v, ",")
 		} else {
 			filterHeader[k] = strings.Join(v, ",")
 		}
@@ -227,6 +230,9 @@ func K2preServeHTTP(url, host string, hdrMap map[string][]string, method string,
 	}
 	if k2RequestIdentifier != "" {
 		filterHeader["K2-FUZZ-REQUEST-ID"] = k2RequestIdentifier
+	}
+	if api_caller != "" {
+		filterHeader["K2-API-CALLER"] = api_caller
 	}
 
 	kb := bytes.TrimRight(body, "\x00")
@@ -250,8 +256,8 @@ func K2preServeHTTP(url, host string, hdrMap map[string][]string, method string,
 	(*infoReq).K2TraceData = traceData
 	(*infoReq).K2RequestIdentifier = k2RequestIdentifier
 	(*infoReq).ServerName = serverName
-	k2i.Info.Secure.K2associate(infoReq)
 	createFuzzFile(k2RequestIdentifier)
+	k2i.Info.Secure.K2associate(infoReq)
 	dura := time.Since(t)
 	logger.Debugln("k2pre ServerHTTP took (ms):", (dura.Nanoseconds())/1000000)
 }
@@ -356,8 +362,8 @@ func K2grpcResponse(service, method, reply string) {
 }
 
 func K2dissociate() {
-	removeFuzzFile()
 	k2i.Info.Secure.K2dissociate()
+	removeFuzzFile()
 }
 
 func XssCheck() {
@@ -446,6 +452,7 @@ func K2RemoveFile(name string) *models.EventJson {
 	}
 	eventId := increaseCount()
 	var args []string
+	args = append(args, name)
 	return k2i.Info.Secure.SendEvent(eventId, "FILE_OPERATION", args)
 }
 
@@ -748,6 +755,7 @@ func grpcRequestWithHeader(header map[string]string) {
 	(*infoReq).ServerPort = getServerPort()
 	(*infoReq).IsGrpc = true
 	host := ""
+	api_caller := ""
 	for k, v := range header {
 
 		if k == ":method" {
@@ -768,6 +776,9 @@ func grpcRequestWithHeader(header map[string]string) {
 			(*infoReq).ServerName = k
 		} else if k2Utils.CaseInsensitiveEquals(k, ":host") {
 			host = k
+		} else if k2Utils.CaseInsensitiveEquals(k, "K2-API-CALLER") {
+			api_caller = v
+			delete(header, k)
 		}
 	}
 	if (*infoReq).K2TraceData != "" {
@@ -775,6 +786,9 @@ func grpcRequestWithHeader(header map[string]string) {
 	}
 	if (*infoReq).K2RequestIdentifier != "" {
 		header["K2-FUZZ-REQUEST-ID"] = (*infoReq).K2RequestIdentifier
+	}
+	if api_caller != "" {
+		header["K2-API-CALLER"] = api_caller
 	}
 	createFuzzFile((*infoReq).K2RequestIdentifier)
 	if (*infoReq).ServerName == "" {

@@ -91,15 +91,9 @@ type AgentInfo struct {
 
 // ---- K2ControlCode101_struct struct used handle CC 101 ------
 type K2ControlCode101_struct struct {
-	AllowedIps      []string `json:"allowedIps"`
-	BlockedIps      []string `json:"blockedIps"`
-	AllowedApis     []string `json:"allowedApis"`
-	BlockedApis     []string `json:"blockedApis"`
-	AllowedRequests []struct {
-		Url                   string   `json:"url"`
-		VulnerabilityCaseType string   `json:"vulnerabilityCaseType"`
-		ImpactingPayloadKeys  []string `json:"impactingPayloadKeys"`
-	} `json:"allowedRequests"`
+	ControlCommand int        `json:"controlCommand"`
+	Arguments      []string   `json:"arguments"`
+	Data           K2Blocking `json:"data"`
 }
 
 // ---- control-code 11 - Fuzz -----
@@ -132,6 +126,22 @@ type K2ControlComand struct {
 	ControlCommand int         `json:"controlCommand"`
 	Arguments      []string    `json:"arguments"`
 	Data           interface{} `json:"data"`
+}
+
+// Blocking
+type K2Blocking struct {
+	Version              string        `json:"version"`
+	Timestamp            int64         `json:"timestamp"`
+	LastUpdateTimestamp  int64         `json:"lastUpdateTimestamp"`
+	LastFetchTime        int           `json:"lastFetchTime"`
+	AttackerIPTimeout    int           `json:"attackerIpTimeout"`
+	PolicyPullInterval   int           `json:"policyPullInterval"`
+	AllowedIps           []interface{} `json:"allowedIps"`
+	BlockedIps           []string      `json:"blockedIps"`
+	AllowedApis          []interface{} `json:"allowedApis"`
+	BlockedApis          []interface{} `json:"blockedApis"`
+	AllowedRequests      []interface{} `json:"allowedRequests"`
+	AdditionalProperties interface{}   `json:"additionalProperties"`
 }
 
 // ---- fuzz fail event -----

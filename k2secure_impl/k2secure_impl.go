@@ -623,7 +623,7 @@ func (k K2secureimpl) K2Event(eventId, category string, args interface{}) *k2mod
 	}
 
 	if k2i.Info.GlobalData.VulnerabilityScan.Enabled && k2i.Info.GlobalData.VulnerabilityScan.IastScan.Enabled {
-		if k2FuzzHeader != "" && k2utils.CaseInsensitiveContains(k2FuzzHeader, apiId) && k2utils.CaseInsensitiveContains(k2FuzzHeader, ":K2: VULNERABLE :K2:") {
+		if k2FuzzHeader != "" && k2utils.CaseInsensitiveContains(k2FuzzHeader, apiId) && k2utils.CaseInsensitiveContains(k2FuzzHeader, ":K2:VULNERABLE:K2:") {
 			tmp_event.CompleteStacktrace = stkjson
 		}
 		tmp_event.IsIASTEnable = true
@@ -674,7 +674,7 @@ func (k K2secureimpl) SendExitEvent(event *k2model.EventJson) {
 	}
 	k2FuzzHeader := (*req).K2RequestIdentifier
 
-	if !(k2FuzzHeader != "" && k2utils.CaseInsensitiveContains(k2FuzzHeader, event.APIID) && k2utils.CaseInsensitiveContains(k2FuzzHeader, ":K2: VULNERABLE :K2:")) {
+	if !(k2FuzzHeader != "" && k2utils.CaseInsensitiveContains(k2FuzzHeader, event.APIID) && k2utils.CaseInsensitiveContains(k2FuzzHeader, ":K2:VULNERABLE:K2:")) {
 		return
 	}
 	var tmp_event k2model.Exitevent
