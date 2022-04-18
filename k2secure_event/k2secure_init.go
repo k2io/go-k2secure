@@ -184,12 +184,24 @@ func initK2Envirement() {
 		k2i.Info.EnvironmentInfo.RunningEnv = "HOST"
 	} else {
 		k2i.Info.EnvironmentInfo.ContainerId = cid
-		if !k2Utils.IsKubernetes() {
-			k2i.Info.EnvironmentInfo.RunningEnv = "CONTAINER"
-		} else {
+		if k2Utils.IsKubernetes() {
 			k2i.Info.EnvironmentInfo.RunningEnv = "KUBERNETES"
 			k2i.Info.EnvironmentInfo.Namespaces = k2Utils.GetKubernetesNS()
 			k2i.Info.EnvironmentInfo.PodId = k2Utils.GetPodId()
+		} else if k2Utils.IsECS() {
+			k2i.Info.EnvironmentInfo.RunningEnv = "ECS"
+			k2i.Info.EnvironmentInfo.EcsTaskId = k2Utils.GetEcsTaskId()
+			err, ecsData := k2Utils.GetECSInfo()
+			if err == nil {
+				k2i.Info.EnvironmentInfo.ImageId = ecsData.ImageID
+				k2i.Info.EnvironmentInfo.Image = ecsData.Image
+				k2i.Info.EnvironmentInfo.ContainerName = ecsData.Labels.ComAmazonawsEcsContainerName
+				k2i.Info.EnvironmentInfo.EcsTaskDefinition = ecsData.Labels.ComAmazonawsEcsTaskDefinitionFamily + ":" + ecsData.Labels.ComAmazonawsEcsTaskDefinitionVersion
+			} else {
+				logger.Errorln(err)
+			}
+		} else {
+			k2i.Info.EnvironmentInfo.RunningEnv = "CONTAINER"
 		}
 	}
 

@@ -238,6 +238,13 @@ func SendApplicationInfo() {
 		identifier["ipAdress"] = k2i.Info.EnvironmentInfo.CollectorIp
 		identifier["namespace"] = k2i.Info.EnvironmentInfo.Namespaces
 		k2i.Info.EnvironmentInfo.ID = k2i.Info.EnvironmentInfo.PodId
+	} else if k2i.Info.EnvironmentInfo.RunningEnv == "ECS" {
+		identifier["id"] = k2i.Info.EnvironmentInfo.PodId
+		identifier["ipAdress"] = k2i.Info.EnvironmentInfo.CollectorIp
+		identifier["imageId"] = k2i.Info.EnvironmentInfo.ImageId
+		identifier["imageId"] = k2i.Info.EnvironmentInfo.ImageId
+		identifier["image"] = k2i.Info.EnvironmentInfo.Image
+		identifier["ecsTaskDefinition"] = k2i.Info.EnvironmentInfo.EcsTaskDefinition
 
 	}
 
