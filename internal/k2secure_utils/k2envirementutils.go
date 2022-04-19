@@ -42,7 +42,7 @@ func IsKubernetes() bool {
 
 func IsECS() bool {
 	env := os.Getenv("AWS_EXECUTION_ENV")
-	return env != "AWS_ECS_FARGATE"
+	return env == "AWS_ECS_FARGATE"
 }
 func GetKubernetesNS() string {
 
@@ -213,7 +213,7 @@ func GetECSInfo() (err error, ecsData k2models.EcsData) {
 	request, err := http.NewRequest(http.MethodGet, url, nil)
 	response, err := restclient.Do(request)
 	if err != nil {
-		return 
+		return
 	}
 	defer response.Body.Close()
 	bodyBytes, err := ioutil.ReadAll(response.Body)
@@ -222,9 +222,9 @@ func GetECSInfo() (err error, ecsData k2models.EcsData) {
 	}
 	if response.StatusCode == 200 {
 		err = json.Unmarshal(bodyBytes, &ecsData)
-		return 
+		return
 	} else {
-		return 
+		return
 	}
 
 }
