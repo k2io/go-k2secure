@@ -51,7 +51,11 @@ func UpdateHttpConnsIn(r *k2model.Info_req) {
 }
 
 func UpdateHttpConnsOut(dest, dport, urlx string) {
-	UpdateHttpConns(urlx, "0.0.0.0", dest, dport, "OUTBOUND", "")
+	if isValidUrl(urlx) {
+		UpdateHttpConns(urlx, "0.0.0.0", dest, dport, "OUTBOUND", "")
+	} else {
+		logger.Debugln("invalid url OUTBOUND HttpConns", urlx)
+	}
 }
 
 func UpdateHttpConns(url, sourceIP, destinationIP, destinationPort, direction, sourceID string) {
@@ -126,4 +130,12 @@ func cannonicalURL(urlx string) string {
 		return urlx
 	}
 	return s
+}
+
+func isValidUrl(inputUrl string) bool {
+	u, err := url.Parse(inputUrl)
+	if err != nil || u.Scheme == "" || u.Host == "" {
+		return false
+	}
+	return true
 }
