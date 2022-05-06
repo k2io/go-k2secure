@@ -156,6 +156,7 @@ func initK2Envirement() {
 	k2i.InitConst(k2_home, runtime.GOOS, applicationUUID)
 	logging.Init_log(applicationUUID, k2i.LOG_FILE_PATH)
 	logger = logging.GetLogger("Init")
+	fmt.Println("K2-Go Agent attached with application, with applicationUUID: "+applicationUUID, "applicationPid ", os.Getpid())
 	logger.Infoln("Application started with UUID : ", applicationUUID)
 	pid := strconv.Itoa(syscall.Getpid())
 	//readAllEnvVariables
