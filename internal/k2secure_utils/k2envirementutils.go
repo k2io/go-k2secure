@@ -4,12 +4,16 @@ package k2secure_utils
 
 import (
 	"bufio"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io/ioutil"
+	"net/http"
 	"os"
 	"strconv"
 	"strings"
+
+	k2models "github.com/k2io/go-k2secure/v2/internal/k2secure_model"
 )
 
 /*
@@ -36,6 +40,10 @@ func IsKubernetes() bool {
 	return env != ""
 }
 
+func IsECS() bool {
+	env := os.Getenv("AWS_EXECUTION_ENV")
+	return env == "AWS_ECS_FARGATE"
+}
 func GetKubernetesNS() string {
 
 	data, e := ioutil.ReadFile(NAMESPACE)
@@ -178,4 +186,45 @@ func IntToString(input int) string {
 
 func Int64ToString(input int64) string {
 	return strconv.FormatInt(input, 10)
+}
+
+func GetEcsTaskId() string {
+	file, e := os.Open(CGROUP)
+	if e != nil {
+		return ""
+	}
+	defer file.Close()
+	scanner := bufio.NewScanner(file)
+	scanner.Split(bufio.ScanLines)
+	for scanner.Scan() {
+		text := scanner.Text()
+		counter := strings.LastIndex(text, ECS_DIR)
+		if counter >= 0 {
+			id := text[counter+4 : strings.LastIndex(text, DIR_SEPERATOR)]
+			return id
+		}
+
+	}
+	return ""
+}
+func GetECSInfo() (err error, ecsData k2models.EcsData) {
+	restclient := &http.Client{Timeout: 0}
+	url := os.Getenv("ECS_CONTAINER_METADATA_URI")
+	request, err := http.NewRequest(http.MethodGet, url, nil)
+	response, err := restclient.Do(request)
+	if err != nil {
+		return
+	}
+	defer response.Body.Close()
+	bodyBytes, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		return
+	}
+	if response.StatusCode == 200 {
+		err = json.Unmarshal(bodyBytes, &ecsData)
+		return
+	} else {
+		return
+	}
+
 }

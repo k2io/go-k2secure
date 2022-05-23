@@ -223,24 +223,37 @@ func SendApplicationInfo() {
 		"kind":        k2i.Info.EnvironmentInfo.RunningEnv,
 		"eventInfo":   eventInfo,
 	}
+
+	envInfo := map[string]interface{}{}
+
 	if k2i.Info.EnvironmentInfo.RunningEnv == "HOST" {
 		identifier["id"] = k2i.Info.EnvironmentInfo.NodeId
-		identifier["os"] = k2i.Info.EnvironmentInfo.Goos
-		identifier["arch"] = k2i.Info.EnvironmentInfo.Goarch
-		identifier["ipAdress"] = k2i.Info.EnvironmentInfo.CollectorIp
+		envInfo["id"] = k2i.Info.EnvironmentInfo.NodeId
+		envInfo["os"] = k2i.Info.EnvironmentInfo.Goos
+		envInfo["arch"] = k2i.Info.EnvironmentInfo.Goarch
+		envInfo["ipAddress"] = k2i.Info.EnvironmentInfo.CollectorIp
 		k2i.Info.EnvironmentInfo.ID = k2i.Info.EnvironmentInfo.NodeId
 	} else if k2i.Info.EnvironmentInfo.RunningEnv == "CONTAINER" {
 		identifier["id"] = k2i.Info.EnvironmentInfo.ContainerId
-		identifier["ipAdress"] = k2i.Info.EnvironmentInfo.CollectorIp
+		envInfo["id"] = k2i.Info.EnvironmentInfo.ContainerId
+		envInfo["ipAddress"] = k2i.Info.EnvironmentInfo.CollectorIp
 		k2i.Info.EnvironmentInfo.ID = k2i.Info.EnvironmentInfo.ContainerId
 	} else if k2i.Info.EnvironmentInfo.RunningEnv == "KUBERNETES" {
 		identifier["id"] = k2i.Info.EnvironmentInfo.PodId
-		identifier["ipAdress"] = k2i.Info.EnvironmentInfo.CollectorIp
-		identifier["namespace"] = k2i.Info.EnvironmentInfo.Namespaces
+		envInfo["id"] = k2i.Info.EnvironmentInfo.PodId
+		envInfo["ipAddress"] = k2i.Info.EnvironmentInfo.CollectorIp
+		envInfo["namespace"] = k2i.Info.EnvironmentInfo.Namespaces
 		k2i.Info.EnvironmentInfo.ID = k2i.Info.EnvironmentInfo.PodId
-
+	} else if k2i.Info.EnvironmentInfo.RunningEnv == "ECS" {
+		identifier["id"] = k2i.Info.EnvironmentInfo.EcsTaskId
+		envInfo["id"] = k2i.Info.EnvironmentInfo.EcsTaskId
+		envInfo["ipAddress"] = k2i.Info.EnvironmentInfo.CollectorIp
+		envInfo["imageId"] = k2i.Info.EnvironmentInfo.ImageId
+		envInfo["imageName"] = k2i.Info.EnvironmentInfo.Image
+		envInfo["ecsTaskDefinition"] = k2i.Info.EnvironmentInfo.EcsTaskDefinition
+		envInfo["containerName"] = k2i.Info.EnvironmentInfo.ContainerName
 	}
-
+	identifier["envInfo"] = envInfo
 	tmp_info.Identifier = identifier
 	// configer deployedApplications and serverInfo
 

@@ -92,7 +92,7 @@ func initBaseAppInfo() {
 func initWithNodeLevelConfFile() bool {
 	confFilePath := k2i.Info.EnvironmentInfo.NlcPath
 	if confFilePath == "" {
-		confFilePath = filepath.Join(k2i.CONFIG_PATH, "node-level-config.yaml") //TODO
+		confFilePath = filepath.Join(k2i.CONFIG_PATH, "node-level-config.yaml")
 	}
 	if !k2Utils.IsFileExist(confFilePath) {
 		logging.PrintWarnlog("Node level configuration was not found or incorrect on path "+confFilePath, "ENV")
@@ -120,8 +120,9 @@ func initWithNodeLevelConfFile() bool {
 func initWithAppLevelConfFile() bool {
 	confFilePath := k2i.Info.EnvironmentInfo.AlcPath
 	if confFilePath == "" {
-		confFilePath = filepath.Join(k2i.CONFIG_PATH, "app-level-config.yaml") //TODO
+		confFilePath = filepath.Join(k2i.CONFIG_PATH, "application-level-config.yaml")
 	}
+	logger.Debugln("application-level-config.yaml file path, ", confFilePath)
 	if !k2Utils.IsFileExist(confFilePath) {
 		logger.Warnln("K2 app-level-config file is missing")
 		logging.PrintWarnlog("Application Level Configuration was not provided", "ENV")
@@ -156,6 +157,7 @@ func initK2Envirement() {
 	k2i.InitConst(k2_home, runtime.GOOS, applicationUUID)
 	logging.Init_log(applicationUUID, k2i.LOG_FILE_PATH)
 	logger = logging.GetLogger("Init")
+	fmt.Println("K2-Go Agent attached with application, with applicationUUID: "+applicationUUID, "applicationPid ", os.Getpid())
 	logger.Infoln("Application started with UUID : ", applicationUUID)
 	pid := strconv.Itoa(syscall.Getpid())
 	//readAllEnvVariables
@@ -184,12 +186,24 @@ func initK2Envirement() {
 		k2i.Info.EnvironmentInfo.RunningEnv = "HOST"
 	} else {
 		k2i.Info.EnvironmentInfo.ContainerId = cid
-		if !k2Utils.IsKubernetes() {
-			k2i.Info.EnvironmentInfo.RunningEnv = "CONTAINER"
-		} else {
+		if k2Utils.IsKubernetes() {
 			k2i.Info.EnvironmentInfo.RunningEnv = "KUBERNETES"
 			k2i.Info.EnvironmentInfo.Namespaces = k2Utils.GetKubernetesNS()
 			k2i.Info.EnvironmentInfo.PodId = k2Utils.GetPodId()
+		} else if k2Utils.IsECS() {
+			k2i.Info.EnvironmentInfo.RunningEnv = "ECS"
+			k2i.Info.EnvironmentInfo.EcsTaskId = k2Utils.GetEcsTaskId()
+			err, ecsData := k2Utils.GetECSInfo()
+			if err == nil {
+				k2i.Info.EnvironmentInfo.ImageId = ecsData.ImageID
+				k2i.Info.EnvironmentInfo.Image = ecsData.Image
+				k2i.Info.EnvironmentInfo.ContainerName = ecsData.Labels.ComAmazonawsEcsContainerName
+				k2i.Info.EnvironmentInfo.EcsTaskDefinition = ecsData.Labels.ComAmazonawsEcsTaskDefinitionFamily + ":" + ecsData.Labels.ComAmazonawsEcsTaskDefinitionVersion
+			} else {
+				logger.Errorln(err)
+			}
+		} else {
+			k2i.Info.EnvironmentInfo.RunningEnv = "CONTAINER"
 		}
 	}
 
