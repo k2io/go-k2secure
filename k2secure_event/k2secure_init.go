@@ -92,7 +92,7 @@ func initBaseAppInfo() {
 func initWithNodeLevelConfFile() bool {
 	confFilePath := k2i.Info.EnvironmentInfo.NlcPath
 	if confFilePath == "" {
-		confFilePath = filepath.Join(k2i.CONFIG_PATH, "node-level-config.yaml") //TODO
+		confFilePath = filepath.Join(k2i.CONFIG_PATH, "node-level-config.yaml")
 	}
 	if !k2Utils.IsFileExist(confFilePath) {
 		logging.PrintWarnlog("Node level configuration was not found or incorrect on path "+confFilePath, "ENV")
@@ -120,8 +120,9 @@ func initWithNodeLevelConfFile() bool {
 func initWithAppLevelConfFile() bool {
 	confFilePath := k2i.Info.EnvironmentInfo.AlcPath
 	if confFilePath == "" {
-		confFilePath = filepath.Join(k2i.CONFIG_PATH, "app-level-config.yaml") //TODO
+		confFilePath = filepath.Join(k2i.CONFIG_PATH, "application-level-config.yaml")
 	}
+	logger.Debugln("application-level-config.yaml file path, ", confFilePath)
 	if !k2Utils.IsFileExist(confFilePath) {
 		logger.Warnln("K2 app-level-config file is missing")
 		logging.PrintWarnlog("Application Level Configuration was not provided", "ENV")
