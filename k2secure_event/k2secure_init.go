@@ -209,9 +209,8 @@ func initK2Envirement() {
 
 	logging.PrintInitlog("Current environment variables : "+k2Utils.StructToString(k2i.Info.EnvironmentInfo), "ENV")
 	if k2i.Info.EnvironmentInfo.GroupName == "" {
-		logger.Errorln("Policy group name should not be nill")
-		logging.PrintInitErrolog("Disable K2 Go agent K2_GROUP_NAME env variable is missing", "ENV")
-		disableagent = true
+		k2i.Info.EnvironmentInfo.GroupName = "IAST"
+		logger.Infoln("Used IAST as default group name")
 	}
 
 	if !disableagent {
