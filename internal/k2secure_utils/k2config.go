@@ -3,8 +3,8 @@
 package k2secure_utils
 
 const (
-	CollectorVersion = "98"
+	CollectorVersion = "99"
 	JsonVersion      = "2.0.0"
 	CollectorType    = "GOLANG"
-	BuildNumber = "98"
+	BuildNumber = "99"
 )
