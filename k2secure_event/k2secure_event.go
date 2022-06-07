@@ -220,13 +220,13 @@ func SendApplicationInfo() {
 		"nodeId":      k2i.Info.EnvironmentInfo.NodeId,
 		"nodeIp":      k2i.Info.EnvironmentInfo.NodeIp,
 		"collectorIp": k2i.Info.EnvironmentInfo.CollectorIp,
-		"kind":        k2i.Info.EnvironmentInfo.RunningEnv,
 		"eventInfo":   eventInfo,
 	}
 
 	envInfo := map[string]interface{}{}
 
 	if k2i.Info.EnvironmentInfo.RunningEnv == "HOST" {
+		identifier["kind"] = "HOST"
 		identifier["id"] = k2i.Info.EnvironmentInfo.NodeId
 		envInfo["id"] = k2i.Info.EnvironmentInfo.NodeId
 		envInfo["os"] = k2i.Info.EnvironmentInfo.Goos
@@ -234,17 +234,20 @@ func SendApplicationInfo() {
 		envInfo["ipAddress"] = k2i.Info.EnvironmentInfo.CollectorIp
 		k2i.Info.EnvironmentInfo.ID = k2i.Info.EnvironmentInfo.NodeId
 	} else if k2i.Info.EnvironmentInfo.RunningEnv == "CONTAINER" {
+		identifier["kind"] = "CONTAINER"
 		identifier["id"] = k2i.Info.EnvironmentInfo.ContainerId
 		envInfo["id"] = k2i.Info.EnvironmentInfo.ContainerId
 		envInfo["ipAddress"] = k2i.Info.EnvironmentInfo.CollectorIp
 		k2i.Info.EnvironmentInfo.ID = k2i.Info.EnvironmentInfo.ContainerId
 	} else if k2i.Info.EnvironmentInfo.RunningEnv == "KUBERNETES" {
+		identifier["kind"] = "POD"
 		identifier["id"] = k2i.Info.EnvironmentInfo.PodId
 		envInfo["id"] = k2i.Info.EnvironmentInfo.PodId
 		envInfo["ipAddress"] = k2i.Info.EnvironmentInfo.CollectorIp
 		envInfo["namespace"] = k2i.Info.EnvironmentInfo.Namespaces
 		k2i.Info.EnvironmentInfo.ID = k2i.Info.EnvironmentInfo.PodId
 	} else if k2i.Info.EnvironmentInfo.RunningEnv == "ECS" {
+		identifier["kind"] = "ECS"
 		identifier["id"] = k2i.Info.EnvironmentInfo.EcsTaskId
 		envInfo["id"] = k2i.Info.EnvironmentInfo.EcsTaskId
 		envInfo["ipAddress"] = k2i.Info.EnvironmentInfo.CollectorIp
