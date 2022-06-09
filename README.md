@@ -14,7 +14,8 @@ GoLang language collector is integrated during the build process.
 
 | Tag | Release Date     | Release Notes                |
 | :-------- | :------- | :------------------------- |
-| `v2.0.0` | `2022-02-15` | [Release Notes](https://github.com/k2io/go-k2secure/releases/tag/2.0.0) |
+| `v2.0.1` | `2022-06-03` | [Release Notes](https://github.com/k2io/go-k2secure/releases/tag/v2.0.1) |
+| `v2.0.0` | `2022-04-27` | [Release Notes](https://github.com/k2io/go-k2secure/releases/tag/v2.0.0) |
 
 
 ## Installation
@@ -25,11 +26,11 @@ GoLang language collector is integrated during the build process.
 - Use the standard golang method to get the K2 package
 
 ```bash
-go get github.com/k2io/go-k2secure@v2.0.0
+go get github.com/k2io/go-k2secure/v2
 ```
 **Step 2**: Import the K2 package into the main module of the application.
 ```bash
-import _ "github.com/k2io/go-k2secure"                      
+import _ "github.com/k2io/go-k2secure/v2"                      
 ```
 **Note**: Import the K2 package before other packages. This ensures it is initialized before any GRPC service registration from any package initialization code.
 
@@ -38,16 +39,16 @@ import _ "github.com/k2io/go-k2secure"                     
 
 | Package used | K2 Instrumentation package (additionally import)| 
 | :-------- | :------- |
-|`google.golang.org/grpc` | `import _ "http://github.com/k2io/go-k2secure/k2secure/k2secure_grpcwrap"`|
-|`github.com/valyala/fasthttp`|`import _ "http://github.com/k2io/go-k2secure/k2secure/k2secure_fasthttpwrap"`|
-|`github.com/antchfx/xpath`|`import _ "http://github.com/k2io/go-k2secure/k2secure/k2secure_xpathwrap"`|
-|`github.com/antchfx/xmlquery`|`import _ "http://github.com/k2io/go-k2secure/k2secure/k2secure_xmlquerywrap"`|
-|`github.com/antchfx/jsonquery`|`import _ "http://github.com/k2io/go-k2secure/k2secure/k2secure_jsonquerywrap"`|
-|`github.com/antchfx/htmlquery`|`import _ "http://github.com/k2io/go-k2secure/k2secure/k2secure_htmlquerywrap"`|
-|`go.mongodb.org/mongo-driver/mongo`|`import _ "http://github.com/k2io/go-k2secure/k2secure/k2secure_mongowrap"`|
-|`github.com/robertkrimen/otto`|`import _ "http://github.com/k2io/go-k2secure/k2secure/k2secure_ottowrap"`|
-|`github.com/augustoroman/v8`|`import _ "http://github.com/k2io/go-k2secure/k2secure/k2secure_v8wrap"`|
-|`github.com/go-ldap/ldap/v3`|`import _ "http://github.com/k2io/go-k2secure/k2secure/k2secure_ldapwrap"`|
+|`google.golang.org/grpc` | `import _ "http://github.com/k2io/go-k2secure/k2secure/k2secure_grpcwrap/v2"`|
+|`github.com/valyala/fasthttp`|`import _ "http://github.com/k2io/go-k2secure/k2secure/k2secure_fasthttpwrap/v2"`|
+|`github.com/antchfx/xpath`|`import _ "http://github.com/k2io/go-k2secure/k2secure/k2secure_xpathwrap/v2"`|
+|`github.com/antchfx/xmlquery`|`import _ "http://github.com/k2io/go-k2secure/k2secure/k2secure_xmlquerywrap/v2"`|
+|`github.com/antchfx/jsonquery`|`import _ "http://github.com/k2io/go-k2secure/k2secure/k2secure_jsonquerywrap/v2"`|
+|`github.com/antchfx/htmlquery`|`import _ "http://github.com/k2io/go-k2secure/k2secure/k2secure_htmlquerywrap/v2"`|
+|`go.mongodb.org/mongo-driver/mongo`|`import _ "http://github.com/k2io/go-k2secure/k2secure/k2secure_mongowrap/v2"`|
+|`github.com/robertkrimen/otto`|`import _ "http://github.com/k2io/go-k2secure/k2secure/k2secure_ottowrap/v2"`|
+|`github.com/augustoroman/v8`|`import _ "http://github.com/k2io/go-k2secure/k2secure/k2secure_v8wrap/v2"`|
+|`github.com/go-ldap/ldap/v3`|`import _ "http://github.com/k2io/go-k2secure/k2secure/k2secure_ldapwrap/v2"`|
 
 Note: If the latest version of K2 package is NOT being used, it is required to get the corresponding version of K2 Instrumentation packages because by default latest version of K2 Instrumentation packages are imported. This can be done like the following example.
 
@@ -58,7 +59,7 @@ import _ "github.com/k2io/go-k2secure/k2secure/k2secure_grpcwrap/v2"
 ```
 Perform the following step:
 ```
-go get github.com/k2io/go-k2secure/k2secure/k2secure_grpcwrap/v2@2.0.0-rc7
+go get github.com/k2io/go-k2secure/k2secure/k2secure_grpcwrap/v2@2.0.1
 ```
 
 **Step 4**: Special Instructions when the application is running in IAST mode with gRPC
@@ -105,7 +106,7 @@ To verify if the given application is protected by K2 Prevent-Web, refer to the 
 package main
 
 import (
-    _ "github.com/k2io/go-k2secure"  // import K2 package
+    _ "github.com/k2io/go-k2secure/v2"  // import K2 package
     "fmt"
     "net/http"
 )
