@@ -99,6 +99,10 @@ func (grpc K2HttpFuzz) K2Fuzz(fTask *k2fuzz.FuzzTask) {
 	} else {
 		logger.Debugln("TODO : Unimplemented : Fuzz ", f.Method)
 	}
+	if req == nil {
+		logger.Debugln("Unimplemented : Fuzz ", f.Method)
+		return
+	}
 	req.URL.RawQuery = req.URL.Query().Encode()
 	// now handle the req and err
 	if err != nil {
