@@ -25,6 +25,9 @@ func (k *K2v8Context) K2v8Eval_s(j, f string) (*v8.Value, error) {
 func (k *K2v8Context) K2v8Eval(j, f string) (*v8.Value, error) {
 	logger.Debugln("------------ v8Eval-hook", "in hook")
 	eventID := k2i.K2EvalJS(j)
+	if k2i.IsBlockedAPI(eventID.ID) {
+		return nil, k2i.K2Exception()
+	}
 	value, err := k.K2v8Eval_s(j, f)
 	k2i.SendExitEvent(eventID, err)
 	return value, err

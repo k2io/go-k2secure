@@ -58,3 +58,12 @@ func checkbyte(a []byte, b []byte) bool {
 	}
 	return true
 }
+
+func Contains(array []string, s string) bool {
+	for _, v := range array {
+		if v == s {
+			return true
+		}
+	}
+	return false
+}

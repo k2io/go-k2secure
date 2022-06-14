@@ -188,10 +188,25 @@ type Info_req struct {
 	K2TraceData         string
 	K2RequestIdentifier string
 	ServerName          string
+	BlockedResponse     bool `default:"false"`
 	//------------------------------------------------------------------------
 }
 
 type Info_grpc struct {
 	ClientIp   string
 	ClientPort string
+}
+
+// ---- control-code 6  -----
+type K2ControlCode6_struct struct {
+	ID               string `json:"id"`
+	EventID          string `json:"eventId"`
+	JSONName         string `json:"jsonName"`
+	Attack           bool   `json:"attack"`
+	ResultMessage    string `json:"resultMessage"`
+	GenerationTime   int    `json:"generationTime"`
+	ReceivedTime     int    `json:"receivedTime"`
+	APIID            string `json:"apiId"`
+	ClientIP         string `json:"clientIP"`
+	IPDetectedViaXFF bool   `json:"ipDetectedViaXFF"`
 }

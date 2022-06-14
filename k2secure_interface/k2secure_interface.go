@@ -24,6 +24,7 @@ type Info_struct struct {
 	HookCalledCount uint64
 	Log             *log.Logger
 	GlobalData      k2model.WebAppPolicy
+	GlobalPolicy    k2model.GlobalPolicy
 	SecureWS        SecureWSiface
 	IsK2Disable     bool
 }
@@ -74,6 +75,9 @@ type Secureiface interface {
 	K2GetFastHttpData() net.Conn
 	SendEvent(eventId, category string, args interface{}) *k2model.EventJson
 	GetFuzzHeader() string
+	K2associateBlockingResponse(string, bool)
+	K2IsApiBlocked(string) bool
+	K2IsHttpBlocked() bool
 }
 
 // ---------------------------------------------------
@@ -202,6 +206,7 @@ func InitK2BaseInfo(scheduler bool) {
 	Info.CustomerInfo = k2model.CustomerInfo{}
 	Info.ApplicationInfo = k2model.RunningApplicationInfo{}
 	Info.GlobalData = k2model.WebAppPolicy{}
+	Info.GlobalPolicy = k2model.GlobalPolicy{}
 	Info.IsK2Disable = false
 	Info.HookCalledCount = 0
 	if scheduler {

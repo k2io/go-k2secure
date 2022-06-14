@@ -31,6 +31,9 @@ func K2HtmlquerySelectorAll(top *html.Node, selector *xpath.Expr) []*html.Node {
 	if selector != nil {
 		fv := reflect.ValueOf(selector).Elem().FieldByName("s")
 		eventID = k2i.K2xpathEval(fv.String())
+		if k2i.IsBlockedAPI(eventID.ID) {
+			return nil
+		}
 	}
 	a := K2HtmlquerySelectorAll_s(top, selector)
 	if a != nil {
@@ -57,6 +60,9 @@ func K2HtmlquerySelector(top *html.Node, selector *xpath.Expr) *html.Node {
 	if selector != nil {
 		fv := reflect.ValueOf(selector).Elem().FieldByName("s")
 		eventID = k2i.K2xpathEval(fv.String())
+		if k2i.IsBlockedAPI(eventID.ID) {
+			return nil
+		}
 	}
 	a := K2HtmlquerySelector_s(top, selector)
 	if a != nil {

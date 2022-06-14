@@ -103,3 +103,18 @@ type AppLevelConfig struct {
 	K2ServiceInfo K2ServiceInfo `yaml:"k2ServiceInfo"`
 	CustomerInfo  CustomerInfo  `yaml:"customerInfo"`
 }
+
+type GlobalPolicy struct {
+	Version             string   `json:"version"`
+	Timestamp           int64    `json:"timestamp"`
+	LastUpdateTimestamp int64    `json:"lastUpdateTimestamp"`
+	PolicyPullInterval  int      `json:"policyPullInterval"`
+	AttackerIPTimeout   int      `json:"attackerIpTimeout"`
+	AllowedIps          []string `json:"allowedIps"`
+	BlockedIps          []string `json:"blockedIps"`
+	AllowedApis         []string `json:"allowedApis"`
+	BlockedApis         []string `json:"blockedApis"`
+	AllowedRequests     []string `json:"allowedRequests"`
+	LastFetchTime       int      `json:"lastFetchTime"`
+	CustomerID          int      `json:"customerId"`
+}

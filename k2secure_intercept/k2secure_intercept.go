@@ -29,6 +29,10 @@ var logger = logging.GetLogger("intercept")
 
 const K2_SEP = ":K2:"
 
+func K2Exception() error {
+	return fmt.Errorf(`raise K2CyberSecurityException.new "K2 has detected an attack.}`)
+
+}
 func Identity() string {
 	return k2i.Identity()
 }
@@ -209,7 +213,6 @@ func K2preServeHTTP(url, host string, hdrMap map[string][]string, method string,
 	if host != "" {
 		clientIp, clientPort = getIpAndPort(host)
 	}
-
 	filterHeader := map[string]string{}
 	k2RequestIdentifier := ""
 	traceData := ""
@@ -965,4 +968,69 @@ func cannonicalURL(urlx string) string {
 		return urlx
 	}
 	return s
+}
+func CheckApiBlockingNeeded(apiId string) bool {
+	if !(k2i.Info.GlobalData.ProtectionMode.Enabled && k2i.Info.GlobalData.ProtectionMode.APIBlocking.Enabled) {
+		return false
+	}
+
+	if k2Utils.Contains(k2i.Info.GlobalPolicy.AllowedApis, apiId) {
+		return false
+	}
+
+	if k2Utils.Contains(k2i.Info.GlobalPolicy.BlockedApis, apiId) {
+		return true
+	}
+	return k2i.Info.GlobalData.ProtectionMode.APIBlocking.ProtectAllApis
+}
+
+func CheckIPBlockingNeeded(apiId string) bool {
+	if !(k2i.Info.GlobalData.ProtectionMode.Enabled && k2i.Info.GlobalData.ProtectionMode.IPBlocking.Enabled) {
+		return false
+	}
+
+	if k2Utils.Contains(k2i.Info.GlobalPolicy.AllowedIps, apiId) {
+		return false
+	}
+
+	if k2Utils.Contains(k2i.Info.GlobalPolicy.BlockedIps, apiId) {
+		return true
+	}
+	return false
+}
+
+func GetAttackerPage(apiId string) string {
+	page := k2Utils.GetApiBlockingPage()
+	return strings.Replace(page, "{{ID}}", apiId, 1)
+}
+func GetAttackerPageIP(ip string) string {
+	page := k2Utils.GetipBlockingPage()
+	return strings.Replace(page, "{{ID}}", ip, 1)
+}
+
+func GetIp(data string, header map[string][]string) string {
+	ip, _ := getIpAndPort(data)
+	if k2i.Info.GlobalData.ProtectionMode.IPBlocking.AttackerIPBlocking && k2i.Info.GlobalData.ProtectionMode.IPBlocking.IPDetectViaXFF {
+		for k, v := range header {
+			if k2Utils.CaseInsensitiveEquals(k, "x-forwarded-for") {
+				ip = strings.Join(v, ",")
+				break
+			}
+		}
+	}
+	return ip
+}
+
+func UpdateBlockingCounter(eventID string, isBlocked bool) {
+	k2i.Info.Secure.K2associateBlockingResponse(eventID, isBlocked)
+}
+
+func IsBlockedAPI(eventID string) bool {
+	if !k2i.Info.GlobalData.ProtectionMode.Enabled && k2i.Info.GlobalData.ProtectionMode.APIBlocking.Enabled {
+		return false
+	}
+	return k2i.Info.Secure.K2IsApiBlocked(eventID)
+}
+func IsBlockedHttp() bool {
+	return k2i.Info.Secure.K2IsHttpBlocked()
 }

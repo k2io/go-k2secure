@@ -357,6 +357,54 @@ func (k K2secureimpl) K2associateGrpcByte(data []byte) {
 	request.GrpcByte = append(request.GrpcByte, data)
 }
 
+func (k K2secureimpl) K2associateBlockingResponse(id string, counter bool) {
+	if !k2Ready("K2.K2associateBlockingResponse") {
+		return
+	}
+	dummy := strings.Split(id, ":")
+	if len(dummy) >= 2 {
+		id = dummy[0]
+	}
+	request := getRequestWithId(id)
+	if request == nil {
+		logger.Errorln("(K2associateBlockingResponse) Request Not Found with ID", id, "  getID()  ", getID())
+		return
+	}
+	if !request.BlockedResponse {
+		request.BlockedResponse = counter
+	}
+}
+
+func (k K2secureimpl) K2IsHttpBlocked() bool {
+	if !k2Ready("K2.K2IsHttpBlocked") {
+		return false
+	}
+	id := getID()
+	request := getRequestWithId(id)
+	if request == nil {
+		logger.Errorln("(K2IsHttpBlocked) Request Not Found ID ", id, "  getID()  ", getID())
+		return false
+	}
+	return request.BlockedResponse
+}
+
+func (k K2secureimpl) K2IsApiBlocked(id string) bool {
+	time.Sleep(1 * time.Second)
+	if !k2Ready("K2.K2IsApiBlocked") {
+		return false
+	}
+	dummy := strings.Split(id, ":")
+	if len(dummy) >= 2 {
+		id = dummy[0]
+	}
+	request := getRequestWithId(id)
+	if request == nil {
+		logger.Errorln("(K2IsApiBlocked) Request Not Found ID ", id, "  getID()  ", getID())
+		return false
+	}
+	return request.BlockedResponse
+}
+
 func (k K2secureimpl) IsRequest() bool {
 	request := getRequest()
 	if request == nil {
@@ -622,6 +670,7 @@ func (k K2secureimpl) K2Event(eventId, category string, args interface{}) *k2mod
 		tmp_event.Stacktrace = stkjson
 	}
 
+	tmp_event.IsAPIBlocked = checkApiBlockingNeeded(apiId)
 	if k2i.Info.GlobalData.VulnerabilityScan.Enabled && k2i.Info.GlobalData.VulnerabilityScan.IastScan.Enabled {
 		if k2FuzzHeader != "" && k2utils.CaseInsensitiveContains(k2FuzzHeader, apiId) && k2utils.CaseInsensitiveContains(k2FuzzHeader, ":K2:VULNERABLE:K2:") {
 			tmp_event.CompleteStacktrace = stkjson
@@ -716,6 +765,13 @@ func getRequest() *k2model.Info_req {
 	}
 	return nil
 }
+func getRequestWithId(id string) *k2model.Info_req {
+	req := k2map.GetFromMap(id)
+	if req != nil {
+		return req.(*k2model.Info_req)
+	}
+	return nil
+}
 
 // ---------------------------------------------------
 // -- associate request with goroutines ID
@@ -787,4 +843,19 @@ func init() {
 func getEventID(id string) string {
 	id = getID() + ":" + id
 	return id
+}
+
+func checkApiBlockingNeeded(apiId string) bool {
+	if !(k2i.Info.GlobalData.ProtectionMode.Enabled && k2i.Info.GlobalData.ProtectionMode.APIBlocking.Enabled) {
+		return false
+	}
+
+	if k2utils.Contains(k2i.Info.GlobalPolicy.AllowedApis, apiId) {
+		return false
+	}
+
+	if k2utils.Contains(k2i.Info.GlobalPolicy.BlockedApis, apiId) {
+		return true
+	}
+	return k2i.Info.GlobalData.ProtectionMode.APIBlocking.ProtectAllApis
 }

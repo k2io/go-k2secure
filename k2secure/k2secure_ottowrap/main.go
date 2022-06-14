@@ -75,6 +75,9 @@ func (k K2ottoStruct) K2ottoRun(src interface{}) (otto.Value, error) {
 		e := src2string(src)
 		if e != "" {
 			eventID = k2i.K2EvalJS(e)
+			if k2i.IsBlockedAPI(eventID.ID) {
+				return nil, k2i.K2Exception()
+			}
 		}
 	}
 	value, err := k.K2ottoRun_s(src)
@@ -103,6 +106,9 @@ func (k K2ottoStruct) K2ottoEval(src interface{}) (otto.Value, error) {
 		e := src2string(src)
 		if e != "" {
 			eventID = k2i.K2EvalJS(e)
+			if k2i.IsBlockedAPI(eventID.ID) {
+				return nil, k2i.K2Exception()
+			}
 		}
 	}
 	value, err := k.K2ottoEval_s(src)

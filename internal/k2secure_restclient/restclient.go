@@ -276,3 +276,41 @@ func UploadLogs(logFilePath, apiAccessorToken, customerId, appUUID, k2resource s
 	}
 	return
 }
+
+func GetGlobalPolicy(k2resource, apiAccessorToken, customerId, currentVersion string) (appPolicy k2models.GlobalPolicy, responce string, err error) {
+	if restclient == nil {
+		restclient = &http.Client{Timeout: 0}
+	}
+	if currentVersion == "" {
+		currentVersion = "0"
+	}
+	var request *http.Request
+	var response *http.Response
+	request, err = http.NewRequest(http.MethodGet, k2resource+"/collector/policy/parameter", nil)
+	query := request.URL.Query()
+	query.Set("currentVersion", currentVersion)
+
+	request.URL.RawQuery = query.Encode()
+	request.Header.Set("K2_API_ACCESSOR_TOKEN", apiAccessorToken)
+	request.Header.Set("K2_CUSTOMER_ID", customerId)
+	fmt.Println(request)
+	response, err = restclient.Do(request)
+	if err != nil {
+		return
+	}
+	fmt.Println(response)
+	defer response.Body.Close()
+	bodyBytes, err := ioutil.ReadAll(response.Body)
+	responce = string(bodyBytes)
+	if err != nil {
+		return
+	}
+	fmt.Println(responce)
+	if response.StatusCode == 200 {
+		err = json.Unmarshal(bodyBytes, &appPolicy)
+		return
+	} else {
+		return appPolicy, responce, errors.New("invalid response " + responce)
+	}
+
+}

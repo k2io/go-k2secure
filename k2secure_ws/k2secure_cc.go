@@ -57,6 +57,7 @@ func ParseControlCode(argbuf []byte) error {
 	case 10:
 		logging.NewStage("6", "POLICY", "Received policy data from Prevent-Web service")
 		k2policy.SendPolicyFetchRequest()
+		k2policy.SendGlobalPolicyFetchRequest()
 		logging.EndStage("6", "POLICY")
 		err := k2policy.Initialise()
 		if err != nil {
@@ -92,6 +93,20 @@ func ParseControlCode(argbuf []byte) error {
 			logger.Errorln("Unable to unmarshall cc101 ", err)
 		} else {
 			logger.Debugln("blocking data", blocking.Data)
+		}
+	case 6:
+		if len(kcc.Arguments[0]) < 1 {
+			logger.Errorln("Unable to unmarshall cc6 ")
+		} else {
+			arg := []byte(kcc.Arguments[0])
+			var blocking k2models.K2ControlCode6_struct
+			err := json.Unmarshal(arg, &blocking)
+			if err != nil {
+				logger.Errorln("Unable to unmarshall cc6 ", err)
+			} else {
+				logger.Debugln("blocking data", blocking)
+			}
+			k2i.Info.Secure.K2associateBlockingResponse(blocking.ID, blocking.Attack)
 		}
 	}
 

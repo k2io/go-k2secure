@@ -82,9 +82,18 @@ func (k *K2HandlerFunc) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 		for key, value := range req.URL.Query() {
 			queryparam[key] = value
 		}
+		clientIp := k2i.GetIp(k2Hosthdr, req.Header)
+		isBlocked := k2i.CheckIPBlockingNeeded(clientIp)
+		if isBlocked {
+			rw.Write([]byte(k2i.GetAttackerPageIP(clientIp)))
+			return
+		}
 		k2i.K2preServeHTTP(req.URL.String(), k2Hosthdr, req.Header, req.Method, k2buf, queryparam, proto, serverName)
 	}
 	k.ServeHTTP_s(rw, req)
+	if k2i.IsBlockedHttp() {
+		rw.Write([]byte(k2i.GetAttackerPage("API ID")))
+	}
 	k2i.XssCheck()
 	k2i.K2dissociate()
 	return
