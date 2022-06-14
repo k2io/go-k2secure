@@ -23,7 +23,7 @@ func K2OpenFile_s(name string, flag int, perm os.FileMode) (*os.File, error) {
 //go:noinline
 func K2OpenFile(name string, flag int, perm os.FileMode) (*os.File, error) {
 	eventId := k2i.K2openFile(name, flag)
-	if k2i.IsBlockedAPI(eventId.ID) {
+	if k2i.IsBlockedAPI(eventId) {
 		return nil, k2i.K2Exception()
 	}
 	file, err := K2OpenFile_s(name, flag, perm)
@@ -34,7 +34,7 @@ func K2OpenFile(name string, flag int, perm os.FileMode) (*os.File, error) {
 //go:noinline
 func K2Remove(name string) error {
 	eventId := k2i.K2RemoveFile(name)
-	if k2i.IsBlockedAPI(eventId.ID) {
+	if k2i.IsBlockedAPI(eventId) {
 		return k2i.K2Exception()
 	}
 	err := K2Remove_s(name)
@@ -79,7 +79,7 @@ func K2StartProcess_s(name string, argv []string, attr *os.ProcAttr) (*os.Proces
 func K2StartProcess(name string, argv []string, attr *os.ProcAttr) (*os.Process, error) {
 	logger.Debugln("Hook Called : ", "os.StartProcess")
 	eventId := k2i.K2preCommand(strings.Join(argv, " "))
-	if k2i.IsBlockedAPI(eventId.ID) {
+	if k2i.IsBlockedAPI(eventId) {
 		return nil, k2i.K2Exception()
 	}
 	out, err := K2StartProcess_s(name, argv, attr)

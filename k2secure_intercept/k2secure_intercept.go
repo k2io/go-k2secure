@@ -1025,11 +1025,14 @@ func UpdateBlockingCounter(eventID string, isBlocked bool) {
 	k2i.Info.Secure.K2associateBlockingResponse(eventID, isBlocked)
 }
 
-func IsBlockedAPI(eventID string) bool {
+func IsBlockedAPI(event *models.EventJson) bool {
+	if event == nil {
+		return false
+	}
 	if !k2i.Info.GlobalData.ProtectionMode.Enabled && k2i.Info.GlobalData.ProtectionMode.APIBlocking.Enabled {
 		return false
 	}
-	return k2i.Info.Secure.K2IsApiBlocked(eventID)
+	return k2i.Info.Secure.K2IsApiBlocked(event.ID)
 }
 func IsBlockedHttp() bool {
 	return k2i.Info.Secure.K2IsHttpBlocked()

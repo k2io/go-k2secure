@@ -47,7 +47,7 @@ func (l *k2ldapConnstruct) K2ldapConnSearch(searchRequest *ldap.SearchRequest) (
 		xm := make(map[string]string, 0)
 		xm["filter"] = UnescapeRFC4515validJSON((*searchRequest).Filter)
 		eventID = k2i.K2ldap(xm)
-		if k2i.IsBlockedAPI(eventID.ID) {
+		if k2i.IsBlockedAPI(eventID) {
 			return nil, k2i.K2Exception()
 		}
 	}
@@ -76,7 +76,7 @@ func (l *k2ldapConnstruct) K2ldapConnModify(mReq *ldap.ModifyRequest) error {
 		xm := make(map[string]string, 0)
 		xm["filter"] = UnescapeRFC4515validJSON((*mReq).DN)
 		eventID = k2i.K2ldap(xm)
-		if k2i.IsBlockedAPI(eventID.ID) {
+		if k2i.IsBlockedAPI(eventID) {
 			return k2i.K2Exception()
 		}
 	}

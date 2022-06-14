@@ -30,7 +30,7 @@ func K2xmlQuerySelectorAll(top *xmlquery.Node, selector *xpath.Expr) []*xmlquery
 	if selector != nil {
 		fv := reflect.ValueOf(selector).Elem().FieldByName("s")
 		eventID = k2i.K2xpathEval(fv.String())
-		if k2i.IsBlockedAPI(eventID.ID) {
+		if k2i.IsBlockedAPI(eventID) {
 			return nil
 		}
 	}
@@ -63,7 +63,7 @@ func K2xmlQuerySelector(top *xmlquery.Node, selector *xpath.Expr) *xmlquery.Node
 	if selector != nil {
 		fv := reflect.ValueOf(selector).Elem().FieldByName("s")
 		eventID = k2i.K2xpathEval(fv.String())
-		if k2i.IsBlockedAPI(eventID.ID) {
+		if k2i.IsBlockedAPI(eventID) {
 			return nil
 		}
 	}

@@ -27,7 +27,7 @@ func (k *K2DB) QueryContext_s(ctx context.Context, query string, args ...interfa
 func (k *K2DB) QueryContext(ctx context.Context, query string, args ...interface{}) (*sql.Rows, error) {
 	logger.Debugln("Hook Called : ", "(*sql.DB).QueryContext")
 	eventId := k2i.K2dbquery(query, args...)
-	if k2i.IsBlockedAPI(eventId.ID) {
+	if k2i.IsBlockedAPI(eventId) {
 		return nil, k2i.K2Exception()
 	}
 	row, err := k.QueryContext_s(ctx, query, args...)
@@ -47,7 +47,7 @@ func (k *K2DB) ExecContext_s(ctx context.Context, query string, args ...interfac
 func (k *K2DB) ExecContext(ctx context.Context, query string, args ...interface{}) (sql.Result, error) {
 	logger.Debugln("Hook Called : ", "(*sql.DB).ExecContext")
 	eventId := k2i.K2dbquery(query, args...)
-	if k2i.IsBlockedAPI(eventId.ID) {
+	if k2i.IsBlockedAPI(eventId) {
 		return nil, k2i.K2Exception()
 	}
 	result, err := k.ExecContext_s(ctx, query, args...)
@@ -93,7 +93,7 @@ func (k *K2Conn) QueryContext_s(ctx context.Context, query string, args ...inter
 func (k *K2Conn) QueryContext(ctx context.Context, query string, args ...interface{}) (*sql.Rows, error) {
 	logger.Debugln("Hook Called : ", "(*sql.Conn).QueryContext")
 	eventId := k2i.K2dbquery(query, args...)
-	if k2i.IsBlockedAPI(eventId.ID) {
+	if k2i.IsBlockedAPI(eventId) {
 		return nil, k2i.K2Exception()
 	}
 	rows, err := k.QueryContext_s(ctx, query, args...)
@@ -113,7 +113,7 @@ func (k *K2Conn) ExecContext_s(ctx context.Context, query string, args ...interf
 func (k *K2Conn) ExecContext(ctx context.Context, query string, args ...interface{}) (*sql.Rows, error) {
 	logger.Debugln("Hook Called : ", "(*sql.Conn).ExecContext")
 	eventId := k2i.K2dbquery(query, args...)
-	if k2i.IsBlockedAPI(eventId.ID) {
+	if k2i.IsBlockedAPI(eventId) {
 		return nil, k2i.K2Exception()
 	}
 	rows, err := k.ExecContext_s(ctx, query, args...)
@@ -159,7 +159,7 @@ func (k *K2Tx) QueryContext_s(ctx context.Context, query string, args ...interfa
 func (k *K2Tx) QueryContext(ctx context.Context, query string, args ...interface{}) (*sql.Rows, error) {
 	logger.Debugln("Hook Called : ", "(*sql.K2Tx).QueryContext")
 	eventId := k2i.K2dbquery(query, args...)
-	if k2i.IsBlockedAPI(eventId.ID) {
+	if k2i.IsBlockedAPI(eventId) {
 		return nil, k2i.K2Exception()
 	}
 	rows, err := k.QueryContext_s(ctx, query, args...)
@@ -179,7 +179,7 @@ func (k *K2Tx) ExecContext_s(ctx context.Context, query string, args ...interfac
 func (k *K2Tx) ExecContext(ctx context.Context, query string, args ...interface{}) (*sql.Rows, error) {
 	logger.Debugln("Hook Called : ", "(*sql.K2Tx).ExecContext")
 	eventId := k2i.K2dbquery(query, args...)
-	if k2i.IsBlockedAPI(eventId.ID) {
+	if k2i.IsBlockedAPI(eventId) {
 		return nil, k2i.K2Exception()
 	}
 	rows, err := k.ExecContext_s(ctx, query, args...)
@@ -228,7 +228,7 @@ func (k *K2Stmt) ExecContext(ctx context.Context, args ...interface{}) (*sql.Row
 	logger.Debugln("in K2query Stmt ExecContext hook")
 	myAddress := fmt.Sprintf("%p", k)
 	eventId := k2i.K2dbexecprepare(myAddress, args...)
-	if k2i.IsBlockedAPI(eventId.ID) {
+	if k2i.IsBlockedAPI(eventId) {
 		return nil, k2i.K2Exception()
 	}
 	rows, err := k.ExecContext_s(ctx, args...)
@@ -250,7 +250,7 @@ func (k *K2Stmt) QueryContext(ctx context.Context, args ...interface{}) (*sql.Ro
 	logger.Debugln("Hook Called : ", "(*sql.K2Tx).QueryContext")
 	myAddress := fmt.Sprintf("%p", k)
 	eventId := k2i.K2dbexecprepare(myAddress, args...)
-	if k2i.IsBlockedAPI(eventId.ID) {
+	if k2i.IsBlockedAPI(eventId) {
 		return nil, k2i.K2Exception()
 	}
 	rows, err := k.QueryContext_s(ctx, args...)

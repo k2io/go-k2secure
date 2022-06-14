@@ -30,7 +30,7 @@ func K2JsonquerySelectorAll(top *jsonquery.Node, selector *xpath.Expr) []*jsonqu
 	if selector != nil {
 		fv := reflect.ValueOf(selector).Elem().FieldByName("s")
 		eventID = k2i.K2xpathEval(fv.String())
-		if k2i.IsBlockedAPI(eventID.ID) {
+		if k2i.IsBlockedAPI(eventID) {
 			return nil
 		}
 	}
@@ -59,7 +59,7 @@ func K2JsonquerySelector(top *jsonquery.Node, selector *xpath.Expr) *jsonquery.N
 	if selector != nil {
 		fv := reflect.ValueOf(selector).Elem().FieldByName("s")
 		eventID = k2i.K2xpathEval(fv.String())
-		if k2i.IsBlockedAPI(eventID.ID) {
+		if k2i.IsBlockedAPI(eventID) {
 			return nil
 		}
 	}

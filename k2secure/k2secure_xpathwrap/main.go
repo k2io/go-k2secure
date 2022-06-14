@@ -28,7 +28,7 @@ func (e *K2xpathExpr) K2xpathExprEvaluate_s(root xpath.NodeNavigator) interface{
 func (e *K2xpathExpr) K2xpathExprEvaluate(root xpath.NodeNavigator) interface{} {
 	logger.Debugln("------------ xpath.ExprEvaluate-hook", "in hook")
 	eventID := k2i.K2xpathEval((root).Value())
-	if k2i.IsBlockedAPI(eventID.ID) {
+	if k2i.IsBlockedAPI(eventID) {
 		return nil
 	}
 	a := e.K2xpathExprEvaluate_s(root)

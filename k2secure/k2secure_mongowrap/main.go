@@ -33,7 +33,7 @@ func (coll *K2Collectionstruct) K2mongoCollectionInsertOne(ctx context.Context, 
 	var eventID = k2i.GetDummyEvent()
 	if documents != nil {
 		eventID = k2i.K2nosqlExec(documents, "", "insert")
-		if k2i.IsBlockedAPI(eventID.ID) {
+		if k2i.IsBlockedAPI(eventID) {
 			return nil, k2i.K2Exception()
 		}
 	}
@@ -58,10 +58,10 @@ func (coll *K2Collectionstruct) K2mongoCollectionInsertMany(ctx context.Context,
 	var eventID = k2i.GetDummyEvent()
 	if documents != nil {
 		eventID = k2i.K2nosqlExec(documents, "", "insert")
-		if k2i.IsBlockedAPI(eventID.ID) {
+		if k2i.IsBlockedAPI(eventID) {
 			return nil, k2i.K2Exception()
 		}
-		if k2i.IsBlockedAPI(eventID.ID) {
+		if k2i.IsBlockedAPI(eventID) {
 			return nil, k2i.K2Exception()
 		}
 	}
@@ -86,7 +86,7 @@ func (coll *K2Collectionstruct) K2mongoCollectionDeleteOne(ctx context.Context, 
 	var eventID = k2i.GetDummyEvent()
 	if filter != nil {
 		eventID = k2i.K2nosqlExec(filter, "", "delete")
-		if k2i.IsBlockedAPI(eventID.ID) {
+		if k2i.IsBlockedAPI(eventID) {
 			return nil, k2i.K2Exception()
 		}
 	}
@@ -111,7 +111,7 @@ func (coll *K2Collectionstruct) K2mongoCollectionDeleteMany(ctx context.Context,
 	var eventID = k2i.GetDummyEvent()
 	if filter != nil {
 		eventID = k2i.K2nosqlExec(filter, "", "delete")
-		if k2i.IsBlockedAPI(eventID.ID) {
+		if k2i.IsBlockedAPI(eventID) {
 			return nil, k2i.K2Exception()
 		}
 	}
@@ -137,7 +137,7 @@ func (coll *K2Collectionstruct) K2mongoCollectionUpdateOne(ctx context.Context, 
 	var eventID = k2i.GetDummyEvent()
 	if filter != nil && update != nil {
 		eventID = k2i.K2nosqlExec(filter, update, "update")
-		if k2i.IsBlockedAPI(eventID.ID) {
+		if k2i.IsBlockedAPI(eventID) {
 			return nil, k2i.K2Exception()
 		}
 	}
@@ -162,7 +162,7 @@ func (coll *K2Collectionstruct) K2mongoCollectionUpdateMany(ctx context.Context,
 	var eventID = k2i.GetDummyEvent()
 	if filter != nil && update != nil {
 		eventID = k2i.K2nosqlExec(filter, update, "update")
-		if k2i.IsBlockedAPI(eventID.ID) {
+		if k2i.IsBlockedAPI(eventID) {
 			return nil, k2i.K2Exception()
 		}
 	}
@@ -187,7 +187,7 @@ func (coll *K2Collectionstruct) K2mongoCollectionReplaceOne(ctx context.Context,
 	var eventID = k2i.GetDummyEvent()
 	if filter != nil && replacement != nil {
 		eventID = k2i.K2nosqlExec(filter, replacement, "update")
-		if k2i.IsBlockedAPI(eventID.ID) {
+		if k2i.IsBlockedAPI(eventID) {
 			return nil, k2i.K2Exception()
 		}
 	}
@@ -212,7 +212,7 @@ func (coll *K2Collectionstruct) K2mongoCollectionFind(ctx context.Context, filte
 	var eventID = k2i.GetDummyEvent()
 	if filter != nil {
 		eventID = k2i.K2nosqlExec(filter, "", "find")
-		if k2i.IsBlockedAPI(eventID.ID) {
+		if k2i.IsBlockedAPI(eventID) {
 			return nil, k2i.K2Exception()
 		}
 	}
@@ -237,7 +237,7 @@ func (coll *K2Collectionstruct) K2mongoCollectionFindOneAndDelete(ctx context.Co
 	var eventID = k2i.GetDummyEvent()
 	if filter != nil {
 		eventID = k2i.K2nosqlExec(filter, "", "delete")
-		if k2i.IsBlockedAPI(eventID.ID) {
+		if k2i.IsBlockedAPI(eventID) {
 			return nil
 		}
 	}
@@ -264,7 +264,7 @@ func (coll *K2Collectionstruct) K2mongoCollectionFindOneAndReplace(ctx context.C
 	var eventID = k2i.GetDummyEvent()
 	if filter != nil {
 		eventID = k2i.K2nosqlExec(filter, replacement, "update")
-		if k2i.IsBlockedAPI(eventID.ID) {
+		if k2i.IsBlockedAPI(eventID) {
 			return nil
 		}
 	}
@@ -291,7 +291,7 @@ func (coll *K2Collectionstruct) K2mongoCollectionFindOneAndUpdate(ctx context.Co
 	var eventID = k2i.GetDummyEvent()
 	if filter != nil {
 		eventID = k2i.K2nosqlExec(filter, update, "update")
-		if k2i.IsBlockedAPI(eventID.ID) {
+		if k2i.IsBlockedAPI(eventID) {
 			return nil
 		}
 
