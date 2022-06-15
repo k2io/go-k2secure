@@ -93,6 +93,7 @@ func ParseControlCode(argbuf []byte) error {
 			logger.Errorln("Unable to unmarshall cc101 ", err)
 		} else {
 			logger.Debugln("blocking data", blocking.Data)
+			k2policy.UpdateGlobalPolicyByControlCommand(blocking.Data)
 		}
 	case 6:
 		if len(kcc.Arguments[0]) < 1 {
@@ -105,11 +106,10 @@ func ParseControlCode(argbuf []byte) error {
 				logger.Errorln("Unable to unmarshall cc6 ", err)
 			} else {
 				logger.Debugln("blocking data", blocking)
+				k2i.Info.Secure.K2associateBlockingResponse(blocking.ID, blocking.APIID, blocking.Attack)
 			}
-			k2i.Info.Secure.K2associateBlockingResponse(blocking.ID, blocking.Attack)
 		}
 	}
-
 	return nil
 }
 

@@ -74,3 +74,21 @@ func updateGlobalPolicy(policy k2models.GlobalPolicy) {
 	}
 	k2i.Info.GlobalPolicy = policy
 }
+
+func UpdateGlobalPolicyByControlCommand(policy k2models.K2Blocking) {
+	logger.Debugln("NEW Global Policy :", policy)
+	k2i.Info.GlobalPolicy.Version = policy.Version
+	k2i.Info.GlobalPolicy.Timestamp = policy.Timestamp
+	k2i.Info.GlobalPolicy.LastUpdateTimestamp = policy.LastUpdateTimestamp
+	k2i.Info.GlobalPolicy.AttackerIPTimeout = policy.AttackerIPTimeout
+	k2i.Info.GlobalPolicy.AllowedIps = policy.AllowedIps
+	k2i.Info.GlobalPolicy.BlockedIps = policy.BlockedIps
+	k2i.Info.GlobalPolicy.AllowedApis = policy.AllowedApis
+	k2i.Info.GlobalPolicy.BlockedApis = policy.BlockedApis
+	k2i.Info.GlobalPolicy.AllowedRequests = policy.AllowedRequests
+	k2i.Info.GlobalPolicy.LastFetchTime = policy.LastFetchTime
+	if policy.PolicyPullInterval != k2i.Info.GlobalPolicy.PolicyPullInterval {
+		scheduleGlobalPolicyFetch(policy.PolicyPullInterval)
+	}
+	k2i.Info.GlobalPolicy.PolicyPullInterval = policy.PolicyPullInterval
+}

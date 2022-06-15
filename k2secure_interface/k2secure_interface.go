@@ -75,9 +75,9 @@ type Secureiface interface {
 	K2GetFastHttpData() net.Conn
 	SendEvent(eventId, category string, args interface{}) *k2model.EventJson
 	GetFuzzHeader() string
-	K2associateBlockingResponse(string, bool)
+	K2associateBlockingResponse(string, string, bool)
 	K2IsApiBlocked(string) bool
-	K2IsHttpBlocked() bool
+	K2IsHttpBlocked() (bool, string)
 }
 
 // ---------------------------------------------------

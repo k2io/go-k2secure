@@ -357,7 +357,7 @@ func (k K2secureimpl) K2associateGrpcByte(data []byte) {
 	request.GrpcByte = append(request.GrpcByte, data)
 }
 
-func (k K2secureimpl) K2associateBlockingResponse(id string, counter bool) {
+func (k K2secureimpl) K2associateBlockingResponse(id, apiId string, counter bool) {
 	if !k2Ready("K2.K2associateBlockingResponse") {
 		return
 	}
@@ -372,20 +372,21 @@ func (k K2secureimpl) K2associateBlockingResponse(id string, counter bool) {
 	}
 	if !request.BlockedResponse {
 		request.BlockedResponse = counter
+		request.BlockedApis = apiId
 	}
 }
 
-func (k K2secureimpl) K2IsHttpBlocked() bool {
+func (k K2secureimpl) K2IsHttpBlocked() (bool, string) {
 	if !k2Ready("K2.K2IsHttpBlocked") {
-		return false
+		return false, ""
 	}
 	id := getID()
 	request := getRequestWithId(id)
 	if request == nil {
 		logger.Errorln("(K2IsHttpBlocked) Request Not Found ID ", id, "  getID()  ", getID())
-		return false
+		return false, ""
 	}
-	return request.BlockedResponse
+	return request.BlockedResponse, request.BlockedApis
 }
 
 func (k K2secureimpl) K2IsApiBlocked(id string) bool {

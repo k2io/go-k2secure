@@ -91,8 +91,9 @@ func (k *K2HandlerFunc) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 		k2i.K2preServeHTTP(req.URL.String(), k2Hosthdr, req.Header, req.Method, k2buf, queryparam, proto, serverName)
 	}
 	k.ServeHTTP_s(rw, req)
-	if k2i.IsBlockedHttp() {
-		rw.Write([]byte(k2i.GetAttackerPage("API ID")))
+	ib, api := k2i.IsBlockedHttp()
+	if ib {
+		rw.Write([]byte(k2i.GetAttackerPage(api)))
 	}
 	k2i.XssCheck()
 	k2i.K2dissociate()
@@ -200,6 +201,9 @@ func (k *K2RequestFunc) K2NewRequestWithContext(req *http.Request) (retres *http
 
 		if url != "" {
 			eventID = k2i.K2request(url, host, port, false, req.Header)
+			if k2i.IsBlockedAPI(eventID) {
+				return nil, k2i.K2Exception()
+			}
 		}
 		if eventID != nil {
 			key, value := k2i.GetTraceHeader(eventID)

@@ -130,18 +130,18 @@ type K2ControlComand struct {
 
 // Blocking
 type K2Blocking struct {
-	Version              string        `json:"version"`
-	Timestamp            int64         `json:"timestamp"`
-	LastUpdateTimestamp  int64         `json:"lastUpdateTimestamp"`
-	LastFetchTime        int           `json:"lastFetchTime"`
-	AttackerIPTimeout    int           `json:"attackerIpTimeout"`
-	PolicyPullInterval   int           `json:"policyPullInterval"`
-	AllowedIps           []interface{} `json:"allowedIps"`
-	BlockedIps           []string      `json:"blockedIps"`
-	AllowedApis          []interface{} `json:"allowedApis"`
-	BlockedApis          []interface{} `json:"blockedApis"`
-	AllowedRequests      []interface{} `json:"allowedRequests"`
-	AdditionalProperties interface{}   `json:"additionalProperties"`
+	Version              string      `json:"version"`
+	Timestamp            int64       `json:"timestamp"`
+	LastUpdateTimestamp  int64       `json:"lastUpdateTimestamp"`
+	LastFetchTime        int         `json:"lastFetchTime"`
+	AttackerIPTimeout    int         `json:"attackerIpTimeout"`
+	PolicyPullInterval   int         `json:"policyPullInterval"`
+	AllowedIps           []string    `json:"allowedIps"`
+	BlockedIps           []string    `json:"blockedIps"`
+	AllowedApis          []string    `json:"allowedApis"`
+	BlockedApis          []string    `json:"blockedApis"`
+	AllowedRequests      []string    `json:"allowedRequests"`
+	AdditionalProperties interface{} `json:"additionalProperties"`
 }
 
 // ---- fuzz fail event -----
@@ -189,6 +189,7 @@ type Info_req struct {
 	K2RequestIdentifier string
 	ServerName          string
 	BlockedResponse     bool `default:"false"`
+	BlockedApis         string
 	//------------------------------------------------------------------------
 }
 

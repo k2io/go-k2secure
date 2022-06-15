@@ -1021,8 +1021,8 @@ func GetIp(data string, header map[string][]string) string {
 	return ip
 }
 
-func UpdateBlockingCounter(eventID string, isBlocked bool) {
-	k2i.Info.Secure.K2associateBlockingResponse(eventID, isBlocked)
+func UpdateBlockingCounter(eventID, apiId string, isBlocked bool) {
+	k2i.Info.Secure.K2associateBlockingResponse(eventID, apiId, isBlocked)
 }
 
 func IsBlockedAPI(event *models.EventJson) bool {
@@ -1034,6 +1034,6 @@ func IsBlockedAPI(event *models.EventJson) bool {
 	}
 	return k2i.Info.Secure.K2IsApiBlocked(event.ID)
 }
-func IsBlockedHttp() bool {
+func IsBlockedHttp() (bool , string) {
 	return k2i.Info.Secure.K2IsHttpBlocked()
 }
