@@ -1013,7 +1013,7 @@ func GetIp(data string, header map[string][]string) string {
 	if k2i.Info.GlobalData.ProtectionMode.IPBlocking.AttackerIPBlocking && k2i.Info.GlobalData.ProtectionMode.IPBlocking.IPDetectViaXFF {
 		for k, v := range header {
 			if k2Utils.CaseInsensitiveEquals(k, "x-forwarded-for") {
-				ip = strings.Join(v, ",")
+				ip = strings.Split(strings.Join(v, ","), ",")[0]
 				break
 			}
 		}
@@ -1034,6 +1034,6 @@ func IsBlockedAPI(event *models.EventJson) bool {
 	}
 	return k2i.Info.Secure.K2IsApiBlocked(event.ID)
 }
-func IsBlockedHttp() (bool , string) {
+func IsBlockedHttp() (bool, string) {
 	return k2i.Info.Secure.K2IsHttpBlocked()
 }

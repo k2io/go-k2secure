@@ -6,7 +6,6 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
-	"fmt"
 	"go/build"
 	"math"
 	"strconv"
@@ -122,7 +121,6 @@ func ReadNodeLevelConfig(filePath string, conf *k2model.NodeLevelConfig) error {
 
 func ReadAppLevelConfig(filePath string, conf *k2model.AppLevelConfig) error {
 	data, err := ioutil.ReadFile(filePath)
-	fmt.Println(string(data))
 	if err == nil {
 		if err == nil {
 			err = yaml.Unmarshal(data, conf)

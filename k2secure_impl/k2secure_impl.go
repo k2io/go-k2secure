@@ -20,6 +20,7 @@ import (
 	k2map "github.com/k2io/go-k2secure/v2/internal/k2secure_hashmap"
 	logging "github.com/k2io/go-k2secure/v2/internal/k2secure_logs"
 	k2model "github.com/k2io/go-k2secure/v2/internal/k2secure_model"
+	k2Utils "github.com/k2io/go-k2secure/v2/internal/k2secure_utils"
 	k2utils "github.com/k2io/go-k2secure/v2/internal/k2secure_utils"
 	k2i "github.com/k2io/go-k2secure/v2/k2secure_interface"
 )
@@ -650,11 +651,22 @@ func (k K2secureimpl) K2Event(eventId, category string, args interface{}) *k2mod
 	if serverPort == "" {
 		serverPort = "-1"
 	}
+	clientIp := (*req).ClientIp
+	if k2i.Info.GlobalData.ProtectionMode.Enabled && k2i.Info.GlobalData.ProtectionMode.IPBlocking.IPDetectViaXFF {
+		for k, v := range (*req).HeaderMap {
+			if k2Utils.CaseInsensitiveEquals(k, "X-Forwarded-For") {
+				clientIp = strings.Split(v, ",")[0]
+				break
+			}
+		}
+		tmp_event.MetaData.IsClientDetectedFromXFF = true
+	}
+
 	tmp_event.HTTPRequest.Body = (*req).Body
 	tmp_event.HTTPRequest.RawRequest = (*req).RawRequest
 	tmp_event.HTTPRequest.Method = (*req).Method
 	tmp_event.HTTPRequest.URL = (*req).Url
-	tmp_event.HTTPRequest.ClientIP = (*req).ClientIp
+	tmp_event.HTTPRequest.ClientIP = clientIp
 	tmp_event.HTTPRequest.ClientPort = clientPort
 	tmp_event.HTTPRequest.Headers = (*req).HeaderMap
 	tmp_event.HTTPRequest.ContentType = (*req).ContentType

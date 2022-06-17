@@ -91,11 +91,11 @@ func (k *K2HandlerFunc) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 		k2i.K2preServeHTTP(req.URL.String(), k2Hosthdr, req.Header, req.Method, k2buf, queryparam, proto, serverName)
 	}
 	k.ServeHTTP_s(rw, req)
+	k2i.XssCheck()
 	ib, api := k2i.IsBlockedHttp()
 	if ib {
 		rw.Write([]byte(k2i.GetAttackerPage(api)))
 	}
-	k2i.XssCheck()
 	k2i.K2dissociate()
 	return
 }

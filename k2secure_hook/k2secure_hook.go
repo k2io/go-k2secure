@@ -93,16 +93,28 @@ type k2cmd struct {
 
 //go:noinline
 func (c *k2cmd) k2Start() error {
+	eventId := k2i.GetDummyEvent()
 	logger.Debugln("Hook Called : ", "(*exec.Cmd).Start")
 	if c != nil {
 		err := reflect.ValueOf(c).Elem().FieldByName("lookPathErr")
 		if err.IsValid() {
 			if !err.IsNil() {
-				k2i.K2preCommand(strings.Join(c.Args, " "))
+				eventId = k2i.K2preCommand(strings.Join(c.Args, " "))
+				if k2i.IsBlockedAPI(eventId) {
+					return k2i.K2Exception()
+				}
 			}
 		}
 	}
 	a := c.k2Start_s()
+	if c != nil {
+		err := reflect.ValueOf(c).Elem().FieldByName("lookPathErr")
+		if err.IsValid() {
+			if !err.IsNil() {
+				k2i.SendExitEvent(eventId, a)
+			}
+		}
+	}
 	return a
 }
 

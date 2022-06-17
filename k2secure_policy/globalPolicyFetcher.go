@@ -45,13 +45,11 @@ func UnscheduleGlobalPolicyFetch() {
 }
 
 func SendGlobalPolicyFetchRequest() {
-	fmt.Println("Global policy fetch started")
 	if globalSkipFirst {
 		globalSkipFirst = false
 		return
 	}
-	policy, res, err := k2estclient.GetGlobalPolicy(k2i.Info.AgentInfo.K2resource, k2i.Info.CustomerInfo.ApiAccessorToken, strconv.Itoa(k2i.Info.CustomerInfo.CustomerId), k2i.Info.GlobalPolicy.Version)
-	fmt.Println("Global policy response", res, err)
+	policy, _, err := k2estclient.GetGlobalPolicy(k2i.Info.AgentInfo.K2resource, k2i.Info.CustomerInfo.ApiAccessorToken, strconv.Itoa(k2i.Info.CustomerInfo.CustomerId), k2i.Info.GlobalPolicy.Version)
 	if err != nil {
 		logger.WithError(err).Infoln("Agent Global Policy fetch failed")
 		return

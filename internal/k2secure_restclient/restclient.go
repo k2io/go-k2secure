@@ -293,19 +293,16 @@ func GetGlobalPolicy(k2resource, apiAccessorToken, customerId, currentVersion st
 	request.URL.RawQuery = query.Encode()
 	request.Header.Set("K2_API_ACCESSOR_TOKEN", apiAccessorToken)
 	request.Header.Set("K2_CUSTOMER_ID", customerId)
-	fmt.Println(request)
 	response, err = restclient.Do(request)
 	if err != nil {
 		return
 	}
-	fmt.Println(response)
 	defer response.Body.Close()
 	bodyBytes, err := ioutil.ReadAll(response.Body)
 	responce = string(bodyBytes)
 	if err != nil {
 		return
 	}
-	fmt.Println(responce)
 	if response.StatusCode == 200 {
 		err = json.Unmarshal(bodyBytes, &appPolicy)
 		return
