@@ -343,6 +343,86 @@ func (s *K2ServeStructGrpc) serveStreams_s(st ServerTransport) {
 	return
 }
 
+//go:noinline
+func K2newClientStream(ctx context.Context, desc *grpc.StreamDesc, cc *grpc.ClientConn, method string, opts ...grpc.CallOption) (_ grpc.ClientStream, err error) {
+	logger.Debugln("------------K2newClientStream---------")
+	url := ""
+	var eventID = k2i.GetDummyEvent()
+	if cc != nil {
+		url = cc.Target()
+		host, port, _ := net.SplitHostPort(url)
+		logger.Debugln("url : ", url, " host : ", host, " port : ", port, " method: ", method)
+		url = url + method
+		proto := "http"
+		if url != "" {
+			url = proto + "://" + url
+			logger.Debugln("final url ", url)
+			var dummy map[string][]string
+			eventID = k2i.K2request(url, host, port, true, dummy)
+		}
+	}
+	if ctx != nil {
+		if eventID != nil {
+			key, value := k2i.GetTraceHeader(eventID)
+			logger.Debugln("k2 tracing data : ", value)
+
+			if key != "" {
+				ctx = metadata.AppendToOutgoingContext(ctx, key, value)
+			}
+		}
+		value := k2i.GetApiCaller(url)
+		ctx = metadata.AppendToOutgoingContext(ctx, "K2-API-CALLER", value)
+		value = k2i.GetFuzzHeader()
+		if value != "" {
+			ctx = metadata.AppendToOutgoingContext(ctx, "k2-fuzz-request-id", value)
+		}
+	}
+	out, e := K2newClientStream_s(ctx, desc, cc, method, opts...)
+	k2i.SendExitEvent(eventID, e)
+	return out, e
+
+}
+
+//go:noinline
+func K2newClientStream_s(ctx context.Context, desc *grpc.StreamDesc, cc *grpc.ClientConn, method string, opts ...grpc.CallOption) (_ grpc.ClientStream, err error) {
+	logger.Debugln("------------K2newClientStream---------")
+	url := ""
+	var eventID = k2i.GetDummyEvent()
+	if cc != nil {
+		url = cc.Target()
+		host, port, _ := net.SplitHostPort(url)
+		logger.Debugln("url : ", url, " host : ", host, " port : ", port, " method: ", method)
+		url = url + method
+		proto := "http"
+		if url != "" {
+			url = proto + "://" + url
+			logger.Debugln("final url ", url)
+			var dummy map[string][]string
+			eventID = k2i.K2request(url, host, port, true, dummy)
+		}
+	}
+	if ctx != nil {
+		if eventID != nil {
+			key, value := k2i.GetTraceHeader(eventID)
+			logger.Debugln("k2 tracing data : ", value)
+
+			if key != "" {
+				ctx = metadata.AppendToOutgoingContext(ctx, key, value)
+			}
+		}
+		value := k2i.GetApiCaller(url)
+		ctx = metadata.AppendToOutgoingContext(ctx, "K2-API-CALLER", value)
+		value = k2i.GetFuzzHeader()
+		if value != "" {
+			ctx = metadata.AppendToOutgoingContext(ctx, "k2-fuzz-request-id", value)
+		}
+	}
+	out, e := K2newClientStream_s(ctx, desc, cc, method, opts...)
+	k2i.SendExitEvent(eventID, e)
+	return out, e
+
+}
+
 func hook() {
 	if k2i.DropHook_grpc() {
 		return
@@ -359,6 +439,8 @@ func hook() {
 	k2i.IsHookedLog("(*grpc.Server).Serve", e)
 	_, e = k2i.HookWrapRawNamed("google.golang.org/grpc.invoke", K2Invoke, K2Invoke_s)
 	k2i.IsHookedLog("google.golang.org/grpc.invoke", e)
+	_, e = k2i.HookWrapRawNamed("google.golang.org/grpc.newClientStream", K2newClientStream, K2newClientStream_s)
+	k2i.IsHookedLog("google.golang.org/grpc.newClientStream", e)
 }
 
 func initBlackOps() {
