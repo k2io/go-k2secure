@@ -6,6 +6,7 @@ import (
 	"bytes"
 	"debug/elf"
 	"encoding/base64"
+	"encoding/json"
 	"fmt"
 	"net"
 	"net/url"
@@ -468,20 +469,22 @@ func K2preCommand(q string) *models.EventJson {
 
 }
 
-func K2nosqlExec(f, g interface{}, qtype string) *models.EventJson {
+func K2nosqlExec(tmp_map []byte, qtype string) *models.EventJson {
 	if !K2OK("pre.nosqlExec") {
 		earlyHookExit(" nosqlExec")
 		return nil
 	}
 	calledID := increaseCount()
-
 	var arg11 []interface{}
 	var arg12 []interface{}
-	tmp_map := map[string]interface{}{
-		"filter":  f,
-		"options": g,
-	}
-	arg11 = append(arg11, tmp_map)
+	// tmp_map := map[string]interface{}{
+	// 	"filter":  f,
+	// 	"options": g,
+	// }
+	var jsonMap map[string]interface{}
+	json.Unmarshal(tmp_map, &jsonMap)
+
+	arg11 = append(arg11, jsonMap)
 	tmp_map1 := map[string]interface{}{
 		"payloadType": qtype,
 		"payload":     arg11,
