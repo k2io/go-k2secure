@@ -233,8 +233,8 @@ func GetECSInfo() (err error, ecsData k2models.EcsData) {
 func GetCurrentGoVersion() int {
 	current_version := runtime.Version()
 	sa := strings.Split(current_version, ".")
-	if len(sa) > 0 {
-		major, err := strconv.Atoi(strings.TrimPrefix(sa[0], "go"))
+	if len(sa) >= 1 {
+		major, err := strconv.Atoi(sa[1])
 		if err == nil {
 			return major
 		}

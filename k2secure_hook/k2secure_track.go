@@ -9,6 +9,7 @@ import (
 	"unsafe"
 
 	logging "github.com/k2io/go-k2secure/v2/internal/k2secure_logs"
+	k2utils "github.com/k2io/go-k2secure/v2/internal/k2secure_utils"
 	k2i "github.com/k2io/go-k2secure/v2/k2secure_intercept"
 )
 
@@ -195,8 +196,9 @@ func getID() string {
 
 func initTrackerhook() error {
 
-	currentVersion := 10
+	currentVersion := k2utils.GetCurrentGoVersion()
 	var e error
+
 	if currentVersion < 15 {
 		_, e = k2i.HookWrapRawNamed("runtime.runqput", K2_runqput14, K2_runqput14_s)
 		logging.IsHooked("runtime.K2_runqput14", e)
