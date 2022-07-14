@@ -10,6 +10,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
+	"runtime"
 	"strconv"
 	"strings"
 
@@ -227,4 +228,16 @@ func GetECSInfo() (err error, ecsData k2models.EcsData) {
 		return
 	}
 
+}
+
+func GetCurrentGoVersion() int {
+	current_version := runtime.Version()
+	sa := strings.Split(current_version, ".")
+	if len(sa) > 0 {
+		major, err := strconv.Atoi(strings.TrimPrefix(sa[0], "go"))
+		if err == nil {
+			return major
+		}
+	}
+	return 15
 }
