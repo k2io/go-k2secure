@@ -3,13 +3,17 @@
 package k2secure_utils
 
 import (
+	"archive/tar"
+	"compress/gzip"
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"go/build"
+	"io"
 	"math"
 	"strconv"
+	"strings"
 
 	"io/ioutil"
 	"net"
@@ -122,7 +126,6 @@ func ReadNodeLevelConfig(filePath string, conf *k2model.NodeLevelConfig) error {
 
 func ReadAppLevelConfig(filePath string, conf *k2model.AppLevelConfig) error {
 	data, err := ioutil.ReadFile(filePath)
-	fmt.Println(string(data))
 	if err == nil {
 		if err == nil {
 			err = yaml.Unmarshal(data, conf)
@@ -181,4 +184,76 @@ func round(val float64, roundOn float64, places int) (newVal float64) {
 	}
 	newVal = round / pow
 	return
+}
+
+// reference vladimirvivien/go-tar
+func Untar(sourcefile, target string) (err error) {
+	tarFile, err := os.Open(sourcefile)
+	if err != nil {
+		return err
+	}
+	defer func() {
+		err = tarFile.Close()
+	}()
+
+	absPath, err := filepath.Abs(target)
+	if err != nil {
+		return err
+	}
+
+	tr := tar.NewReader(tarFile)
+	if strings.HasSuffix(sourcefile, ".gz") || strings.HasSuffix(sourcefile, ".gzip") {
+		gz, err := gzip.NewReader(tarFile)
+		if err != nil {
+			return err
+		}
+		defer gz.Close()
+		tr = tar.NewReader(gz)
+	}
+
+	// untar each segment
+	for {
+		hdr, err := tr.Next()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			return err
+		}
+
+		// determine proper file path info
+		finfo := hdr.FileInfo()
+		fileName := hdr.Name
+		if filepath.IsAbs(fileName) {
+			fileName, err = filepath.Rel("/", fileName)
+			if err != nil {
+				return err
+			}
+		}
+		absFileName := filepath.Join(absPath, fileName)
+
+		if finfo.Mode().IsDir() {
+			if err := os.MkdirAll(absFileName, 0755); err != nil {
+				return err
+			}
+			continue
+		}
+
+		// create new file with original file mode
+		file, err := os.OpenFile(absFileName, os.O_RDWR|os.O_CREATE|os.O_TRUNC, finfo.Mode().Perm())
+		if err != nil {
+			return err
+		}
+		n, cpErr := io.Copy(file, tr)
+		if closeErr := file.Close(); closeErr != nil { // close file immediately
+			return err
+		}
+		if cpErr != nil {
+			return cpErr
+		}
+		if n != finfo.Size() {
+			return fmt.Errorf("unexpected bytes written: wrote %d, want %d", n, finfo.Size())
+		}
+	}
+	return nil
 }

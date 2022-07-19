@@ -3,22 +3,21 @@
 package k2secure_cvescan
 
 import (
-	"archive/tar"
-	"compress/gzip"
 	"context"
 	"crypto/sha256"
 	"encoding/hex"
 	"errors"
 	"fmt"
-	"io"
 	"io/ioutil"
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
 
+	k2restclient "github.com/k2io/go-k2secure/v2/internal/k2secure_restclient"
 	k2utils "github.com/k2io/go-k2secure/v2/internal/k2secure_utils"
 	k2i "github.com/k2io/go-k2secure/v2/k2secure_interface"
 )
@@ -33,30 +32,34 @@ var (
 
 // Initialization for CVE SCAN on CC 8
 
-func RunCveScan(isApp, isEnv bool) {
+func RunCveScan(isApp, isEnv bool, latestServiceVersion, latestProcessedServiceSHA256 string) {
 	appScanYml = filepath.Join(k2i.CVE_TAR_SPACE, "K2", "service-input.yml")
 	envScanYml = filepath.Join(k2i.CVE_TAR_SPACE, "K2", "envservice-input.yml")
 	outputDir = filepath.Join(k2i.CVE_TAR_SPACE, "K2")
 	cveScanMutex.Lock()
 	if isApp {
-		err := createServiceYml(false)
-		if err != nil {
-			logger.Errorln(err)
-		} else {
-			runCommand(appScanYml)
+		if downloadCveTar(latestServiceVersion, latestProcessedServiceSHA256) {
+			err := createServiceYml(false)
+			if err != nil {
+				logger.Errorln(err)
+			} else {
+				runCommand(appScanYml)
+			}
 		}
 	}
 	if isEnv {
-		err := createServiceYml(true)
-		if err != nil {
-			logger.Errorln(err)
-		} else {
-			runCommand(envScanYml)
+		if downloadCveTar(latestServiceVersion, latestProcessedServiceSHA256) {
+			err := createServiceYml(true)
+			if err != nil {
+				logger.Errorln(err)
+			} else {
+				runCommand(envScanYml)
+			}
 		}
 	}
-	if os.Getenv("K2_CLEANUP") != "false" {
-		deleteFile()
-	}
+	// if os.Getenv("K2_CLEANUP") != "false" {
+	// 	deleteFile()
+	// }
 	cveScanMutex.Unlock()
 }
 
@@ -117,69 +120,6 @@ func runCommand(startupScript string) (bool, error) {
 	return true, nil
 }
 
-func Untar(sourcefile, target string) (bool, error) {
-
-	file, err := os.Open(sourcefile)
-
-	if err != nil {
-
-		return false, err
-	}
-
-	defer file.Close()
-
-	var fileReader io.ReadCloser = file
-	if strings.HasSuffix(sourcefile, ".gz") {
-		if fileReader, err = gzip.NewReader(file); err != nil {
-
-			return false, err
-		}
-		defer fileReader.Close()
-	}
-
-	tarBallReader := tar.NewReader(fileReader)
-	for {
-		header, err := tarBallReader.Next()
-		if err != nil {
-			if err == io.EOF {
-				break
-			}
-			return false, err
-		}
-		filename := filepath.Join(target, header.Name)
-
-		switch header.Typeflag {
-		case tar.TypeDir:
-			err = os.MkdirAll(filename, os.FileMode(header.Mode))
-
-			if err != nil {
-				return false, err
-			}
-
-		case tar.TypeReg:
-			writer, err := os.Create(filename)
-
-			if err != nil {
-				return false, err
-			}
-
-			io.Copy(writer, tarBallReader)
-
-			err = os.Chmod(filename, os.FileMode(header.Mode))
-
-			if err != nil {
-				return false, err
-			}
-
-			writer.Close()
-		default:
-			logger.Errorln("Unable to untar type : %c in file %s", header.Typeflag, filename)
-		}
-	}
-
-	return true, nil
-}
-
 func isFileExists(path string) bool {
 	_, err := os.Stat(path)
 	if err == nil {
@@ -234,5 +174,23 @@ func deleteFile() {
 	err := os.RemoveAll(k2i.CVE_TAR_SPACE)
 	if err != nil {
 		logger.Errorln("Unable to delete cve dir ", err)
+	}
+}
+
+func downloadCveTar(latestServiceVersion, latestProcessedServiceSHA256 string) bool {
+	filename, err := k2restclient.GetCVETar(k2i.CVE_TAR_SPACE, k2i.Info.EnvironmentInfo.Goos, "x64", k2i.Info.AgentInfo.K2resource, k2i.Info.CustomerInfo.ApiAccessorToken, strconv.Itoa(k2i.Info.CustomerInfo.CustomerId), latestServiceVersion, k2i.Info.ApplicationInfo.AppUUID, latestProcessedServiceSHA256)
+	if err == nil {
+		logger.Infoln("CVE scan tar downloaded")
+		err := k2utils.Untar(filepath.Join(k2i.CVE_TAR_SPACE, filename), k2i.CVE_TAR_SPACE)
+		if err == nil {
+			return true
+			// lastScanVersion = data.LatestServiceVersion
+		} else {
+			logger.Infoln("err during untar cve tar ", err)
+			return false
+		}
+	} else {
+		logger.Infoln("CVE tar downloading fails", err)
+		return false
 	}
 }
