@@ -186,74 +186,68 @@ func round(val float64, roundOn float64, places int) (newVal float64) {
 	return
 }
 
-// reference vladimirvivien/go-tar
-func Untar(sourcefile, target string) (err error) {
-	tarFile, err := os.Open(sourcefile)
+func Untar(sourcefile, target string) error {
+
+	file, err := os.Open(sourcefile)
 	if err != nil {
 		return err
 	}
-	defer func() {
-		err = tarFile.Close()
-	}()
+	defer file.Close()
 
-	absPath, err := filepath.Abs(target)
-	if err != nil {
-		return err
-	}
+	var fileReader io.ReadCloser = file
+	if strings.HasSuffix(sourcefile, ".gz") {
+		if fileReader, err = gzip.NewReader(file); err != nil {
 
-	tr := tar.NewReader(tarFile)
-	if strings.HasSuffix(sourcefile, ".gz") || strings.HasSuffix(sourcefile, ".gzip") {
-		gz, err := gzip.NewReader(tarFile)
-		if err != nil {
 			return err
 		}
-		defer gz.Close()
-		tr = tar.NewReader(gz)
+		defer fileReader.Close()
 	}
 
-	// untar each segment
+	tarBallReader := tar.NewReader(fileReader)
+	link := make(map[string]string)
 	for {
-		hdr, err := tr.Next()
-		if err == io.EOF {
-			break
-		}
+		header, err := tarBallReader.Next()
 		if err != nil {
+			if err == io.EOF {
+				break
+			}
 			return err
 		}
+		filename := filepath.Join(target, header.Name)
+		switch header.Typeflag {
+		case tar.TypeDir:
+			err = os.MkdirAll(filename, os.FileMode(header.Mode))
 
-		// determine proper file path info
-		finfo := hdr.FileInfo()
-		fileName := hdr.Name
-		if filepath.IsAbs(fileName) {
-			fileName, err = filepath.Rel("/", fileName)
 			if err != nil {
 				return err
 			}
-		}
-		absFileName := filepath.Join(absPath, fileName)
 
-		if finfo.Mode().IsDir() {
-			if err := os.MkdirAll(absFileName, 0755); err != nil {
+		case tar.TypeReg:
+			//	fmt.Println(filename)
+			writer, err := os.Create(filename)
+
+			if err != nil {
 				return err
 			}
-			continue
+
+			io.Copy(writer, tarBallReader)
+
+			err = os.Chmod(filename, os.FileMode(header.Mode))
+
+			if err != nil {
+				return err
+			}
+			writer.Close()
+		case tar.TypeSymlink:
+			link[filename] = header.Linkname
+		default:
+			fmt.Println("Unable to untar type : %c in file %s", header.Typeflag, filename)
 		}
 
-		// create new file with original file mode
-		file, err := os.OpenFile(absFileName, os.O_RDWR|os.O_CREATE|os.O_TRUNC, finfo.Mode().Perm())
-		if err != nil {
-			return err
-		}
-		n, cpErr := io.Copy(file, tr)
-		if closeErr := file.Close(); closeErr != nil { // close file immediately
-			return err
-		}
-		if cpErr != nil {
-			return cpErr
-		}
-		if n != finfo.Size() {
-			return fmt.Errorf("unexpected bytes written: wrote %d, want %d", n, finfo.Size())
-		}
+	}
+	for filename, linkname := range link {
+		//fmt.Println(linkname, filename)
+		os.Symlink(linkname, filename)
 	}
 	return nil
 }

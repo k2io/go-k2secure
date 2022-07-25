@@ -104,7 +104,7 @@ func createServiceYml(isEnv bool) (err error) {
 func runCommand(startupScript string) (bool, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 1200*time.Second)
 	defer cancel()
-
+	logger.Infoln(k2i.CVE_STARPUP, k2i.CVE_STARPUP_COMMAD, startupScript)
 	cmd := exec.CommandContext(ctx, k2i.CVE_STARPUP, k2i.CVE_STARPUP_COMMAD, startupScript)
 	_, err := cmd.CombinedOutput()
 	if ctx.Err() != context.DeadlineExceeded {
