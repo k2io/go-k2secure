@@ -345,9 +345,6 @@ func (m *HashMap) Grow(newSize uintptr) {
 }
 
 func (m *HashMap) grow(newSize uintptr, loop bool) {
-
-	defer atomic.CompareAndSwapUintptr(&m.resizing, uintptr(1), uintptr(0))
-
 	for {
 		data := m.mapData()
 		if newSize == 0 {
@@ -382,6 +379,7 @@ func (m *HashMap) grow(newSize uintptr, loop bool) {
 		}
 		newSize = 0 // 0 means double the current size
 	}
+	atomic.CompareAndSwapUintptr(&m.resizing, uintptr(1), uintptr(0))
 }
 
 func (m *HashMap) fillIndexItems(mapData *hashMapData) {
